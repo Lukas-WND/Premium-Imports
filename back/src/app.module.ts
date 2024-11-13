@@ -1,8 +1,9 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { dataSourceOptions } from './database/data-source';
 import { VehicleModule } from './vehicle/vehicle.module';
+import { dataSourceOptions } from './database/data-source';
+import { ModelModule } from './model/model.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { VehicleModule } from './vehicle/vehicle.module';
     }),
     TypeOrmModule.forRoot(dataSourceOptions),
     VehicleModule,
+    ModelModule,
   ],
   controllers: [],
   providers: [],
