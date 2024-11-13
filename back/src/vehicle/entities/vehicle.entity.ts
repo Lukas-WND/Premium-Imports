@@ -1,5 +1,14 @@
 import { Model } from 'src/model/entities/model.entity';
-import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  JoinColumn,
+  OneToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 @Entity()
 export class Vehicle {
@@ -21,6 +30,16 @@ export class Vehicle {
   @Column({ type: 'double' })
   price: number;
 
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  @DeleteDateColumn()
+  deletedAt: Date;
+
   @OneToOne(() => Model)
+  @JoinColumn()
   model: Model;
 }
