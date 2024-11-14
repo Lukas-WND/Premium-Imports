@@ -1,6 +1,7 @@
 import { Model } from 'src/model/entities/model.entity';
 import { Order } from 'src/order/entities/order.entity';
 import { Purchase } from 'src/purchase/entities/purchase.entity';
+import { Sale } from 'src/sale/entities/sale.entity';
 import {
   Column,
   CreateDateColumn,
@@ -42,6 +43,9 @@ export class Vehicle {
 
   @OneToMany(() => Purchase, (purchase) => purchase.vehicle)
   purchases: Purchase[];
+
+  @OneToMany(() => Sale, (sale) => sale.vehicle)
+  sales: Sale[];
 
   @CreateDateColumn()
   createdAt: Date;
