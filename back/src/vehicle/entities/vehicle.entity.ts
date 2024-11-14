@@ -1,10 +1,13 @@
 import { Model } from 'src/model/entities/model.entity';
+import { Order } from 'src/order/entities/order.entity';
+import { Purchase } from 'src/purchase/entities/purchase.entity';
 import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
   JoinColumn,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -30,6 +33,16 @@ export class Vehicle {
   @Column({ type: 'double' })
   price: number;
 
+  @OneToOne(() => Model, (model) => model.vehicle)
+  @JoinColumn({ name: 'model' })
+  model: Model;
+
+  @OneToOne(() => Order, (order) => order.vehicle)
+  order: Order;
+
+  @OneToMany(() => Purchase, (purchase) => purchase.vehicle)
+  purchases: Purchase[];
+
   @CreateDateColumn()
   createdAt: Date;
 
@@ -38,8 +51,4 @@ export class Vehicle {
 
   @DeleteDateColumn()
   deletedAt: Date;
-
-  @OneToOne(() => Model)
-  @JoinColumn()
-  model: Model;
 }

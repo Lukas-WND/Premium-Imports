@@ -1,5 +1,13 @@
 import { Vehicle } from 'src/vehicle/entities/vehicle.entity';
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  OneToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 @Entity()
 export class Model {
@@ -11,7 +19,10 @@ export class Model {
 
   @Column({ type: 'int' })
   modelYear: number;
-  
+
+  @OneToOne(() => Vehicle, (vehicle) => vehicle.model)
+  vehicle: Vehicle;
+
   @CreateDateColumn()
   createdAt: Date;
 
