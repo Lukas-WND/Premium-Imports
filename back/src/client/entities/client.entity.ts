@@ -29,7 +29,7 @@ export class Client {
   state: string;
 
   @Column({ length: 11 })
-  homePhome: string;
+  homePhone: string;
 
   @Column({ length: 11 })
   cellPhone: string;

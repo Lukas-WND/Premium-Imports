@@ -26,7 +26,7 @@ export class Sale {
   @Column({ type: 'double', nullable: false })
   entryValue: number;
 
-  @Column({ type: 'double' })
+  @Column({ type: 'double', nullable: true })
   financedAmount: number;
 
   @Column({ type: 'double', nullable: false })

@@ -1,1 +1,4 @@
-export class CreateSellerDto {}
+export class CreateSellerDto {
+  registration: string;
+  name: string;
+}
