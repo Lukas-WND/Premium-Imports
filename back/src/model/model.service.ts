@@ -1,19 +1,40 @@
 import { Injectable } from '@nestjs/common';
 import { CreateModelDto } from './dto/create-model.dto';
 import { UpdateModelDto } from './dto/update-model.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Model } from './entities/model.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class ModelService {
-  create(createModelDto: CreateModelDto) {
-    return 'This action adds a new model';
+  constructor(
+    @InjectRepository(Model)
+    private modelRepository: Repository<Model>,
+  ) {}
+
+  async create(createModelDto: CreateModelDto) {
+    const createModelResult = this.modelRepository.create({
+      modelName: createModelDto.name,
+      modelYear: createModelDto.year,
+    });
+
+    return this.modelRepository.save(createModelResult);
   }
 
-  findAll() {
-    return `This action returns all model`;
+  async findAll() {
+    const findAllModelsResult = await this.modelRepository.find();
+
+    return findAllModelsResult.length > 0
+      ? findAllModelsResult
+      : 'Não foram encontrados registros de modelos.';
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} model`;
+  async findOne(id: string) {
+    const resultFindOneModel = await this.modelRepository.findOne({
+      where: { id: id },
+    });
+
+    return resultFindOneModel;
   }
 
   update(id: number, updateModelDto: UpdateModelDto) {

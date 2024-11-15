@@ -19,7 +19,7 @@ export class ModelController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.modelService.findOne(+id);
+    return this.modelService.findOne(id);
   }
 
   @Patch(':id')
