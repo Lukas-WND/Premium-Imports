@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { AutomakerService } from './automaker.service';
 import { CreateAutomakerDto } from './dto/create-automaker.dto';
 import { UpdateAutomakerDto } from './dto/update-automaker.dto';
@@ -19,16 +27,19 @@ export class AutomakerController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.automakerService.findOne(+id);
+    return this.automakerService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAutomakerDto: UpdateAutomakerDto) {
-    return this.automakerService.update(+id, updateAutomakerDto);
+  update(
+    @Param('id') id: string,
+    @Body() updateAutomakerDto: UpdateAutomakerDto,
+  ) {
+    return this.automakerService.update(id, updateAutomakerDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.automakerService.remove(+id);
+    return this.automakerService.remove(id);
   }
 }

@@ -1,6 +1,8 @@
+import { CreateVehicleDto } from "src/vehicle/dto/create-vehicle.dto";
+
 export class CreatePurchaseDto {
   purchaseValue: number;
   clientId: string;
   sellerId: string;
-  vehicleId: string;
+  vehicle: CreateVehicleDto;
 }
