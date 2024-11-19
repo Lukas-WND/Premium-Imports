@@ -1,7 +1,6 @@
 import { Automaker } from 'src/automaker/entities/automaker.entity';
 import { Client } from 'src/client/entities/client.entity';
 import { Seller } from 'src/seller/entities/seller.entity';
-import { Vehicle } from 'src/vehicle/entities/vehicle.entity';
 import {
   Column,
   CreateDateColumn,
@@ -9,7 +8,6 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
-  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -43,6 +41,15 @@ export class Order {
   })
   status: OrderStatus;
 
+  @Column()
+  color: string;
+
+  @Column()
+  modelName: string;
+
+  @Column({ type: 'int' })
+  modelYear: number;
+
   @ManyToOne(() => Client)
   @JoinColumn({ name: 'client' })
   client: Client;
@@ -54,10 +61,6 @@ export class Order {
   @ManyToOne(() => Automaker, (automaker) => automaker)
   @JoinColumn({ name: 'automaker' })
   automaker: Automaker;
-
-  @OneToOne(() => Vehicle, (vehicle) => vehicle.order)
-  @JoinColumn({ name: 'vehicle' })
-  vehicle: Vehicle;
 
   @CreateDateColumn()
   createdAt: Date;

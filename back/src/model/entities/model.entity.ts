@@ -4,7 +4,7 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  OneToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -20,8 +20,8 @@ export class Model {
   @Column({ type: 'int' })
   modelYear: number;
 
-  @OneToOne(() => Vehicle, (vehicle) => vehicle.model)
-  vehicle: Vehicle;
+  @OneToMany(() => Vehicle, (vehicle) => vehicle.model)
+  vehicles: Vehicle[];
 
   @CreateDateColumn()
   createdAt: Date;

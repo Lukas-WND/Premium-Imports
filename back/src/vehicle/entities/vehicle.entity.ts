@@ -1,5 +1,4 @@
 import { Model } from 'src/model/entities/model.entity';
-import { Order } from 'src/order/entities/order.entity';
 import { Purchase } from 'src/purchase/entities/purchase.entity';
 import { Sale } from 'src/sale/entities/sale.entity';
 import {
@@ -8,6 +7,7 @@ import {
   DeleteDateColumn,
   Entity,
   JoinColumn,
+  ManyToOne,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -22,7 +22,7 @@ export class Vehicle {
   @Column({ nullable: false, unique: true })
   chassisNumber: string;
 
-  @Column()
+  @Column({ nullable: true })
   plate: string;
 
   @Column({ type: 'int' })
@@ -34,12 +34,9 @@ export class Vehicle {
   @Column({ type: 'double' })
   price: number;
 
-  @OneToOne(() => Model, (model) => model.vehicle)
+  @ManyToOne(() => Model, (model) => model.vehicles)
   @JoinColumn({ name: 'model' })
   model: Model;
-
-  @OneToOne(() => Order, (order) => order.vehicle)
-  order: Order;
 
   @OneToMany(() => Purchase, (purchase) => purchase.vehicle)
   purchases: Purchase[];
