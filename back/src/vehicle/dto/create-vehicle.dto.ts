@@ -1,6 +1,6 @@
 export class CreateVehicleDto {
-  chassisNumer: string;
-  plate: string;
+  chassisNumber: string;
+  plate?: string;
   fabricatingYear: number;
   color: string;
   price: number;
