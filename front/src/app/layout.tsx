@@ -30,11 +30,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen`}
       >
-        <header className="w-full h-20 flex justify-center items-center">
+        <header className="w-full h-20 flex justify-center items-center border-b-2">
           <div className="px-10 w-full flex justify-between">
-            <div className="flex gap-8">
-              <div>
-                <Image src={""} alt="logo" />
+            <div className="flex gap-10">
+              <div className="w-36">
+                {/* <Image src={""} alt="logo" /> */}
               </div>
               <nav className="flex gap-4">
                 <Link href={"/vendas"}>Vendas</Link>
