@@ -14,6 +14,13 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
+export enum OrderStatus {
+  'IN_PROCESSING' = 0,
+  'CONFIRMED' = 1,
+  'SENT' = 2,
+  'COMPLETED' = 3,
+}
+
 @Entity()
 export class Order {
   @PrimaryGeneratedColumn('uuid')
@@ -27,6 +34,14 @@ export class Order {
 
   @Column({ type: 'double', nullable: false })
   orderValue: number;
+
+  @Column({
+    type: 'enum',
+    enum: OrderStatus,
+    comment: '0 - IN PROCESSING, 1 - CONFIRMED, 2 - SENT, 3 - COMPLETED',
+    default: OrderStatus.IN_PROCESSING,
+  })
+  status: OrderStatus;
 
   @ManyToOne(() => Client)
   @JoinColumn({ name: 'client' })
