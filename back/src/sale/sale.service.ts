@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateSaleDto } from './dto/create-sale.dto';
@@ -19,17 +24,56 @@ export class SaleService {
   ) {}
 
   /**
-   * Cria uma nova venda, relacionando cliente, vendedor e veículo.
+   * Valida o financiamento para um cliente.
+   * @param amount Valor financiado.
+   * @param clientId ID do cliente.
+   * @returns `true` se aprovado, caso contrário lança uma exceção.
+   */
+  private async validateFinancing(
+    amount: number,
+    clientId: string,
+  ): Promise<boolean> {
+    const client = await this.clientService.findOne(clientId);
+
+    if (!client) {
+      throw new NotFoundException('Cliente não encontrado!');
+    }
+
+    if (amount <= 0) {
+      throw new BadRequestException(
+        'Valor do financiamento deve ser positivo.',
+      );
+    }
+
+    return true;
+  }
+
+  /**
+   * Cria uma nova venda, associando cliente, vendedor e veículo.
    * @param createSaleDto Dados da venda.
    * @returns A venda criada.
    */
-  async create(createSaleDto: CreateSaleDto) {
-    const client = await this.clientService.findOne(createSaleDto.clientId);
-    const seller = await this.sellerService.findOne(createSaleDto.sellerId);
-    const vehicle = await this.vehicleService.findOne(createSaleDto.vehicleId);
+  async create(createSaleDto: CreateSaleDto): Promise<Sale> {
+    const { clientId, sellerId, vehicleId, financedAmount } = createSaleDto;
+
+    const client = await this.clientService.findOne(clientId);
+    const seller = await this.sellerService.findOne(sellerId);
+    const vehicle = await this.vehicleService.findOne(vehicleId);
+
+    if (!client || !seller || !vehicle) {
+      throw new BadRequestException(
+        'Cliente, vendedor ou veículo não encontrados.',
+      );
+    }
+
+    if (financedAmount) {
+      await this.validateFinancing(financedAmount, clientId);
+    }
 
     const newSale = this.saleRepository.create({
       ...createSaleDto,
+      saleCode: `SLE-${Date.now()}`,
+      saleDate: new Date(),
       client,
       seller,
       vehicle,
@@ -39,16 +83,16 @@ export class SaleService {
   }
 
   /**
-   * Retorna todas as vendas cadastradas, com seus relacionamentos.
-   * @returns Lista de vendas ou uma exceção se nenhuma venda for encontrada.
+   * Retorna todas as vendas cadastradas, incluindo seus relacionamentos.
+   * @returns Lista de vendas.
    */
-  async findAll() {
+  async findAll(): Promise<Readonly<Sale[]>> {
     const sales = await this.saleRepository.find({
       relations: ['client', 'seller', 'vehicle', 'vehicle.model'],
     });
 
     if (!sales.length) {
-      throw new NotFoundException('Não foram encontrados registros de vendas.');
+      throw new NotFoundException('Nenhuma venda encontrada.');
     }
 
     return sales;
@@ -57,28 +101,28 @@ export class SaleService {
   /**
    * Retorna uma venda específica pelo ID, com seus relacionamentos.
    * @param id ID da venda.
-   * @returns A venda encontrada ou uma exceção.
+   * @returns A venda encontrada.
    */
-  async findOne(id: string) {
+  async findOne(id: string): Promise<Sale> {
     const sale = await this.saleRepository.findOne({
       where: { id },
       relations: ['client', 'seller', 'vehicle', 'vehicle.model'],
     });
 
     if (!sale) {
-      throw new NotFoundException(`Venda com o ID ${id} não encontrada.`);
+      throw new NotFoundException(`Venda com ID "${id}" não encontrada.`);
     }
 
     return sale;
   }
 
   /**
-   * Atualiza os dados de uma venda, permitindo alterações em cliente, vendedor e veículo.
+   * Atualiza os dados de uma venda.
    * @param id ID da venda.
    * @param updateSaleDto Dados para atualização.
    * @returns A venda atualizada.
    */
-  async update(id: string, updateSaleDto: UpdateSaleDto) {
+  async update(id: string, updateSaleDto: UpdateSaleDto): Promise<Sale> {
     const sale = await this.findOne(id);
 
     if (updateSaleDto.clientId) {
@@ -99,12 +143,16 @@ export class SaleService {
   }
 
   /**
-   * Remove uma venda da base de dados via exclusão lógica.
+   * Remove uma venda utilizando exclusão lógica.
    * @param id ID da venda.
    * @returns Resultado da operação.
    */
-  async remove(id: string) {
-    await this.findOne(id); // Garante que a venda existe antes de tentar removê-la.
-    return this.saleRepository.softDelete(id);
+  async remove(id: string): Promise<void> {
+    const sale = await this.findOne(id);
+    if (!sale) {
+      throw new NotFoundException(`Venda com ID "${id}" não encontrada.`);
+    }
+
+    await this.saleRepository.softDelete(id);
   }
 }
