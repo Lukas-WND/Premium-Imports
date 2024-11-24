@@ -5,6 +5,7 @@ import Link from "next/link";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "@/lib/react-query";
 import { Toaster } from "@/components/ui/toaster";
+import Image from "next/image";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -37,9 +38,9 @@ export default function RootLayout({
             <div className="px-10 w-full flex justify-between">
               <div className="flex gap-10">
                 <div className="w-36">
-                  {/* <Image src={""} alt="logo" /> */}
+                  <Image src={"/logo.svg"} alt="Logo" width={144} height={20}/>
                 </div>
-                <nav className="flex gap-4">
+                <nav className="flex gap-4 items-center">
                   <Link href={"/vendas"}>Vendas</Link>
                   <Link href={"/compras"}>Compras</Link>
                   <Link href={"/pedidos"}>Pedidos</Link>

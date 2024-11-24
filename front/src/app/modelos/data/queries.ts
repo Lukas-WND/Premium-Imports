@@ -6,6 +6,7 @@ const route: string = "/model"
 // Obtém todos os modelos
 export async function getModels(): Promise<Model[] | null> {
     try {
+        await new Promise((resolve) => setTimeout(resolve, 500));
         const { data } = await api.get(route);
         return data;
     } catch (error) {
