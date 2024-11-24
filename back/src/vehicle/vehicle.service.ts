@@ -23,6 +23,8 @@ export class VehicleService {
   async create(createVehicleDto: CreateVehicleDto) {
     let model: Model;
 
+    console.log(createVehicleDto);
+
     // Verifica se um `modelId` foi fornecido e tenta buscar o modelo.
     if (createVehicleDto.modelId) {
       model = await this.modelService.findOne(createVehicleDto.modelId);
@@ -43,7 +45,7 @@ export class VehicleService {
     // Cria o veículo associado ao modelo.
     const newVehicle = this.vehicleRepository.create({
       ...createVehicleDto,
-      model,
+      modelId: model,
     });
 
     // Salva o novo veículo no banco de dados.
@@ -55,7 +57,7 @@ export class VehicleService {
    * @returns Lista de veículos ou uma exceção caso não existam registros.
    */
   async findAll() {
-    const vehicles = await this.vehicleRepository.find();
+    const vehicles = await this.vehicleRepository.find({relations: ['modelId']});
 
     if (!vehicles.length) {
       throw new NotFoundException(
@@ -85,7 +87,7 @@ export class VehicleService {
     const vehicle = await this.findVehicleByIdOrFail(id);
 
     // Atualiza somente os campos fornecidos
-    this.vehicleRepository.merge(vehicle, updateVehicleDto);
+    // this.vehicleRepository.merge(vehicle, updateVehicleDto);
 
     return this.vehicleRepository.save(vehicle);
   }

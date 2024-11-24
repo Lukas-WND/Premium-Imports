@@ -20,7 +20,7 @@ export class Model {
   @Column({ type: 'int' })
   modelYear: number;
 
-  @OneToMany(() => Vehicle, (vehicle) => vehicle.model)
+  @OneToMany(() => Vehicle, (vehicle) => vehicle.modelId)
   vehicles: Vehicle[];
 
   @CreateDateColumn()

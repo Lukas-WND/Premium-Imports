@@ -1,8 +1,10 @@
+import "./globals.css";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import "./globals.css";
 import Link from "next/link";
-import Image from "next/image";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { queryClient } from "@/lib/react-query";
+import { Toaster } from "@/components/ui/toaster";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -26,30 +28,34 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-br">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen`}
-      >
-        <header className="w-full h-20 flex justify-center items-center border-b-2">
-          <div className="px-10 w-full flex justify-between">
-            <div className="flex gap-10">
-              <div className="w-36">
-                {/* <Image src={""} alt="logo" /> */}
+    <QueryClientProvider client={queryClient}>
+      <html lang="pt-br">
+        <body
+          className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen`}
+        >
+          <header className="w-full h-20 flex justify-center items-center border-b-2">
+            <div className="px-10 w-full flex justify-between">
+              <div className="flex gap-10">
+                <div className="w-36">
+                  {/* <Image src={""} alt="logo" /> */}
+                </div>
+                <nav className="flex gap-4">
+                  <Link href={"/vendas"}>Vendas</Link>
+                  <Link href={"/compras"}>Compras</Link>
+                  <Link href={"/pedidos"}>Pedidos</Link>
+                  <Link href={"/veiculos"}>Veículos</Link>
+                  <Link href={"/modelos"}>Modelos</Link>
+                  <Link href={"/montadoras"}>Montadoras</Link>
+                  <Link href={"/clientes"}>Clientes</Link>
+                </nav>
               </div>
-              <nav className="flex gap-4">
-                <Link href={"/vendas"}>Vendas</Link>
-                <Link href={"/compras"}>Compras</Link>
-                <Link href={"/pedidos"}>Pedidos</Link>
-                <Link href={"/veiculos"}>Veículos</Link>
-                <Link href={"/montadoras"}>Montadoras</Link>
-                <Link href={"/clientes"}>Clientes</Link>
-              </nav>
+              <div>Buscar</div>
             </div>
-            <div>Buscar</div>
-          </div>
-        </header>
-        <main className="w-full h-full p-10">{children}</main>
-      </body>
-    </html>
+          </header>
+          <main className="w-full h-full p-10">{children}</main>
+          <Toaster />
+        </body>
+      </html>
+    </QueryClientProvider>
   );
 }

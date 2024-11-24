@@ -1,4 +1,4 @@
-import DataTable from "../components/DataTable";
+import DataTable from "../../components/utils/DataTable";
 
 export default function VendasPage() {
     return (

@@ -252,7 +252,7 @@ export default function DataTable<TData, TValue>({
       </div>
       <div className="rounded-md border overflow-hidden">
         <Table>
-          <TableHeader className="bg-custom-blue">
+          <TableHeader className="bg-amber-700">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id} className="rounded">
                 {headerGroup.headers.map((header) => (
@@ -304,13 +304,13 @@ export default function DataTable<TData, TValue>({
           <PaginationComponent pagination={pagination} />
         </div>
       )}
-      <pre>
+      {/* <pre>
         {JSON.stringify(
           { columnFilters: table.getState().columnFilters },
           null,
           2
         )}
-      </pre>
+      </pre> */}
     </div>
   );
 }

@@ -18,6 +18,8 @@ export class ModelService {
    * @returns O modelo criado.
    */
   async create(createModelDto: CreateModelDto) {
+
+    console.log('model: ',createModelDto)
     const newModel = this.modelRepository.create({
       modelName: createModelDto.name,
       modelYear: createModelDto.year,
