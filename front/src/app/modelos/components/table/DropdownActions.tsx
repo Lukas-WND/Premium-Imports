@@ -11,7 +11,7 @@ import {
 import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
 // import FormService from "./FormServices";
-import { Model } from "./columns";
+import { Model } from "@/app/stores/modelStore";
 import DialogDelete from "./DialogDelete";
 // import DialogDelete from "./DialogDelete";
 
@@ -51,7 +51,7 @@ export default function DropdownActions({ model }: { model: Model }) {
                 setShowDialog(true);
                 setDialogComponent(
                   <DialogDelete
-                    serviceId={model.modelId}
+                    modelId={model.modelId}
                     setShowDialog={setShowDialog}
                   />
                 );

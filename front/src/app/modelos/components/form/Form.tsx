@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useMutation } from "@tanstack/react-query";
 import { createModel, updateModel } from "../../data/queries";
 
-export function Form({ data }: { data?: Model }) {
+export function CreateModelForm({ data }: { data?: Model }) {
   const modelSchema = z.object({
     modelId: z.string().optional(),
     modelName: z.string().min(1, "O campo Nome do Modelo é obrigatório"),
@@ -64,7 +64,7 @@ export function Form({ data }: { data?: Model }) {
       className="flex flex-col gap-4"
       onSubmit={handleSubmit(data ? handleUpdateModel : handleCreateModel)}
     >
-      <div>
+      <div className="flex flex-col gap-4 mt-2">
         <Label className="w-full">
           <p>Nome do Modelo</p>
           <Input
@@ -93,11 +93,11 @@ export function Form({ data }: { data?: Model }) {
           )}
         </Label>
       </div>
-      <div className="flex items-center justify-end gap-2=4">
+      <div className="flex items-center justify-end gap-2 mt-4">
         <Button type="submit" disabled={isLoading}>
           Salvar
         </Button>
-        <Button variant="outline">Cancelar</Button>
+        <Button variant="outline" type="button">Cancelar</Button>
       </div>
     </form>
   );

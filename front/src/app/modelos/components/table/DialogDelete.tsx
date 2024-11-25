@@ -45,7 +45,7 @@ export default function DialogDelete({
   return (
     <>
       <DialogHeader>
-        <DialogTitle>Deletar Permissão</DialogTitle>
+        <DialogTitle>Deletar Modelo</DialogTitle>
         <DialogDescription>
           Tem certeza que quer deletar esse registro do sistema? Essa ação não
           pode ser desfeita!
