@@ -1,23 +1,34 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
-import { getModels } from "../../data/queries";
-import TableSkeleton from "@/components/utils/TableSkeleton";
-import DataTable from "@/components/utils/DataTable";
+import { useEffect } from "react";
 import { columns } from "./columns";
+import { getModels } from "../../data/queries";
+import { useQuery } from "@tanstack/react-query";
+import DataTable from "@/components/utils/DataTable";
+import { useModelStore } from "@/app/stores/modelStore";
+import TableSkeleton from "@/components/utils/TableSkeleton";
 
 export function ModelTable() {
+  const setModelList = useModelStore((state) => state.setModelList);
+  const modelList = useModelStore((state) => state.modelList);
+
   const { data: models, isLoading } = useQuery({
     queryKey: ["models"],
     queryFn: getModels,
   });
+
+  useEffect(() => {
+    if (models) {
+      setModelList(models);
+    }
+  }, [models, setModelList]);
 
   return (
     <div>
       {isLoading ? (
         <TableSkeleton />
       ) : (
-        <DataTable columns={columns} data={models || []} />
+        <DataTable columns={columns} data={modelList} />
       )}
     </div>
   );

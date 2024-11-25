@@ -1,11 +1,6 @@
 import { ColumnDef } from "@tanstack/react-table";
 import DropdownActions from "./DropdownActions";
-
-export type Model = {
-  modelId: string;
-  modelName: string;
-  modelYear: string;
-};
+import { Model } from "../../../stores/modelStore";
 
 export const columns: ColumnDef<Model>[] = [
   {
@@ -18,7 +13,7 @@ export const columns: ColumnDef<Model>[] = [
   },
   {
     id: "actions",
-    
+
     cell: ({ row }) => {
       const model = row.original;
 

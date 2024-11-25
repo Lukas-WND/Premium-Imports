@@ -6,16 +6,17 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useMutation } from "@tanstack/react-query";
+
+import { useToast } from "@/hooks/use-toast";
 import { deleteModel } from "../../data/queries";
 import { queryClient } from "@/lib/react-query";
-import { useToast } from "@/hooks/use-toast";
+import { useMutation } from "@tanstack/react-query";
 
 export default function DialogDelete({
-  serviceId,
+  modelId,
   setShowDialog,
 }: {
-  serviceId: string;
+  modelId: string;
   setShowDialog: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const { toast } = useToast();
@@ -27,7 +28,6 @@ export default function DialogDelete({
       queryClient.invalidateQueries({
         queryKey: ["services"],
       });
-      //   toast.success('Permissão excluída com sucesso!')
     },
     onError() {
       //   toast.error('Erro ao excluir permissão')
@@ -55,7 +55,7 @@ export default function DialogDelete({
         <DialogClose asChild>
           <Button variant="outline">Cancelar</Button>
         </DialogClose>
-        <Button onClick={() => handleDeleteService(serviceId)}>Deletar</Button>
+        <Button onClick={() => handleDeleteService(modelId)}>Deletar</Button>
       </DialogFooter>
     </>
   );
