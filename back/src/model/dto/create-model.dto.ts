@@ -1,4 +1,4 @@
 export class CreateModelDto {
-  name: string;
-  year: number;
+  modelName: string;
+  modelYear: number;
 }

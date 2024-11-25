@@ -37,8 +37,8 @@ export class VehicleService {
     } else {
       // Se o `modelId` não foi fornecido, cria um novo modelo.
       model = await this.modelService.create({
-        name: createVehicleDto.modelName,
-        year: createVehicleDto.modelYear,
+        modelName: createVehicleDto.modelName,
+        modelYear: createVehicleDto.modelYear,
       });
     }
 

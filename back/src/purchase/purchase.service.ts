@@ -30,8 +30,8 @@ export class PurchaseService {
     const model = createPurchaseDto.vehicle.modelId
       ? await this.modelService.findOne(createPurchaseDto.vehicle.modelId)
       : await this.modelService.create({
-          name: createPurchaseDto.vehicle.modelName,
-          year: createPurchaseDto.vehicle.modelYear,
+          modelName: createPurchaseDto.vehicle.modelName,
+          modelYear: createPurchaseDto.vehicle.modelYear,
         });
 
     // Criando o veículo

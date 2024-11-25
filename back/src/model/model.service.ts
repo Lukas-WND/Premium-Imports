@@ -21,8 +21,8 @@ export class ModelService {
 
     console.log('model: ',createModelDto)
     const newModel = this.modelRepository.create({
-      modelName: createModelDto.name,
-      modelYear: createModelDto.year,
+      modelName: createModelDto.modelName,
+      modelYear: createModelDto.modelYear,
     });
 
     return this.modelRepository.save(newModel);
@@ -63,8 +63,8 @@ export class ModelService {
 
     // Atualiza somente os campos fornecidos
     this.modelRepository.merge(model, {
-      modelName: updateModelDto.name ?? model.modelName,
-      modelYear: updateModelDto.year ?? model.modelYear,
+      modelName: updateModelDto.modelName ?? model.modelName,
+      modelYear: updateModelDto.modelYear ?? model.modelYear,
     });
 
     return this.modelRepository.save(model);
