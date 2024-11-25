@@ -18,8 +18,7 @@ export class ModelService {
    * @returns O modelo criado.
    */
   async create(createModelDto: CreateModelDto) {
-
-    console.log('model: ',createModelDto)
+    console.log('model: ', createModelDto);
     const newModel = this.modelRepository.create({
       modelName: createModelDto.modelName,
       modelYear: createModelDto.modelYear,
@@ -36,7 +35,9 @@ export class ModelService {
     const models = await this.modelRepository.find();
 
     if (!models.length) {
-      throw new NotFoundException('Não foram encontrados registros de modelos.');
+      throw new NotFoundException(
+        'Não foram encontrados registros de modelos.',
+      );
     }
 
     return models;
@@ -86,10 +87,14 @@ export class ModelService {
    * @returns O modelo encontrado.
    */
   private async findModelByIdOrFail(id: string): Promise<Model> {
-    const model = await this.modelRepository.findOne({ where: { id } });
+    const model = await this.modelRepository.findOne({
+      where: { modelId: id },
+    });
 
     if (!model) {
-      throw new NotFoundException('Nenhum modelo encontrado com o ID informado.');
+      throw new NotFoundException(
+        'Nenhum modelo encontrado com o ID informado.',
+      );
     }
 
     return model;

@@ -37,7 +37,7 @@ export class PurchaseService {
     // Criando o veículo
     const vehicle = await this.vehicleService.create({
       ...createPurchaseDto.vehicle,
-      modelId: model.id,
+      modelId: model.modelId,
     });
 
     // Criando a compra
