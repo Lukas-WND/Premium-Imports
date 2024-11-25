@@ -9,45 +9,46 @@ import {
 
 import { useToast } from "@/hooks/use-toast";
 import { deleteModel } from "../../data/queries";
-import { queryClient } from "@/lib/react-query";
 import { useMutation } from "@tanstack/react-query";
+import { Model, useModelStore } from "@/app/stores/modelStore";
 
-export default function DialogDelete({
-  modelId,
-  setShowDialog,
+export function DialogDelete({
+  model,
+  hideDialog,
 }: {
-  modelId: string;
-  setShowDialog: React.Dispatch<React.SetStateAction<boolean>>;
+  model: Model;
+  hideDialog: () => void;
 }) {
   const { toast } = useToast();
+  const removeModel = useModelStore((state) => state.removeModelInList);
 
-  const { mutateAsync: deleteModelFn } = useMutation({
-    mutationFn: deleteModel,
+  const { mutate: deleteModelFn } = useMutation({
+    mutationFn: (id: string) => deleteModel(id),
     onSuccess() {
-      setShowDialog(false);
-      queryClient.invalidateQueries({
-        queryKey: ["services"],
+      hideDialog();
+      removeModel(model.modelId);
+      toast({
+        title: "Modelo deletado com sucesso",
+        description:
+          "Modelo foi deletado com sucesso na base de dados do sistema!",
+        style: { backgroundColor: "green", color: "white" },
       });
     },
-    onError() {
-      //   toast.error('Erro ao excluir permissão')
+    onError(err: any) {
+      toast({
+        title: "Erro ao deletar modelo!",
+        description: `${err.message}`,
+        variant: "destructive",
+      });
     },
   });
-
-  async function handleDeleteService(id: string) {
-    try {
-      await deleteModelFn(id);
-    } catch (err) {
-      console.error(err);
-    }
-  }
 
   return (
     <>
       <DialogHeader>
         <DialogTitle>Deletar Modelo</DialogTitle>
         <DialogDescription>
-          Tem certeza que quer deletar esse registro do sistema? Essa ação não
+          Tem certeza que deseja deletar esse registro do sistema? Essa ação não
           pode ser desfeita!
         </DialogDescription>
       </DialogHeader>
@@ -55,7 +56,15 @@ export default function DialogDelete({
         <DialogClose asChild>
           <Button variant="outline">Cancelar</Button>
         </DialogClose>
-        <Button onClick={() => handleDeleteService(modelId)}>Deletar</Button>
+        <Button
+          variant="destructive"
+          onClick={() => {
+            console.log(model);
+            deleteModelFn(model.modelId);
+          }}
+        >
+          Deletar
+        </Button>
       </DialogFooter>
     </>
   );

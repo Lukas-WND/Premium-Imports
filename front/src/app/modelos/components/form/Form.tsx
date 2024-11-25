@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { Model } from "@/app/stores/modelStore";
+import { Model, useModelStore } from "@/app/stores/modelStore";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -7,8 +7,18 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { useMutation } from "@tanstack/react-query";
 import { createModel, updateModel } from "../../data/queries";
+import { useToast } from "@/hooks/use-toast";
 
-export function CreateModelForm({ data }: { data?: Model }) {
+export function CreateModelForm({
+  data,
+  hideDialog,
+}: {
+  data?: Model;
+  hideDialog: () => void;
+}) {
+  const { toast } = useToast()
+  const addModel = useModelStore((state) => state.addModelInList);
+
   const modelSchema = z.object({
     modelId: z.string().optional(),
     modelName: z.string().min(1, "O campo Nome do Modelo é obrigatório"),
@@ -17,6 +27,22 @@ export function CreateModelForm({ data }: { data?: Model }) {
 
   const newModel = useMutation({
     mutationFn: createModel,
+    onSuccess: (createdModel: Model) => {
+      hideDialog();
+      addModel(createdModel);
+      toast({
+        title: "Modelo Criado com sucesso!",
+        description: "Novo modelo foi registrado com sucesso na base de dados do sistema!",
+        style: {backgroundColor: "green", color: "white"}
+      })
+    },
+    onError: (err) => {
+      toast({
+        title: "Erro ao criar novo modelo!",
+        description: `${err.message}`,
+        variant: "destructive"
+      })
+    }
   });
 
   const uptModel = useMutation({
@@ -27,6 +53,21 @@ export function CreateModelForm({ data }: { data?: Model }) {
       modelId: string;
       updates: Partial<Omit<Model, "modelId">>;
     }) => updateModel(modelId, updates),
+    onSuccess: () => {
+      hideDialog();
+      toast({
+        title: "Modelo atualizado com sucesso!",
+        description: `O modelo ${data?.modelName} foi atualizado com sucesso na base de dados do sistema!`,
+        style: {backgroundColor: "green", color: "white"}
+      })
+    },
+    onError: (err) => {
+      toast({
+        title: "Erro ao atualizar o modelo!",
+        description: `${err.message}`,
+        variant: "destructive"
+      })
+    }
   });
 
   const handleCreateModel: SubmitHandler<z.infer<typeof modelSchema>> = (
@@ -97,7 +138,9 @@ export function CreateModelForm({ data }: { data?: Model }) {
         <Button type="submit" disabled={isLoading}>
           Salvar
         </Button>
-        <Button variant="outline" type="button">Cancelar</Button>
+        <Button variant="outline" type="button">
+          Cancelar
+        </Button>
       </div>
     </form>
   );

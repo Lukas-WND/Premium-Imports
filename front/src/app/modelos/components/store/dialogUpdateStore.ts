@@ -1,14 +1,14 @@
-import React from "react";
 import { create } from "zustand";
 
-type DialogStore = {
+type DialogUpdateStore = {
   show: boolean;
   showDialog: () => void;
   hideDialog: () => void;
 };
 
-export const useDialogStore = create<DialogStore>((set) => ({
+export const useDialogUpdateStore = create<DialogUpdateStore>((set) => ({
   show: false,
+  component: null,
   showDialog: () => {
     set({ show: true });
   },

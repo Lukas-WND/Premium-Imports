@@ -1,4 +1,4 @@
-import { ModelTable } from "./components/table/table";
+import { ModelTable } from "./components/table/Table";
 
 export default function ModelosPage() {
     return (

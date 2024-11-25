@@ -7,7 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import DataTable from "@/components/utils/DataTable";
 import { useModelStore } from "@/app/stores/modelStore";
 import TableSkeleton from "@/components/utils/TableSkeleton";
-import { CreateModel } from "../CreateModel";
+import { CreateModel } from "./CreateModel";
 
 export function ModelTable() {
   const setModelList = useModelStore((state) => state.setModelList);
