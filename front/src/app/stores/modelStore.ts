@@ -3,7 +3,7 @@ import { create } from "zustand";
 export type Model = {
   modelId: string;
   modelName: string;
-  modelYear: string;
+  modelYear: number;
 };
 
 export type Actions = {

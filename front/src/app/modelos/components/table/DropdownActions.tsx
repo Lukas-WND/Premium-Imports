@@ -12,7 +12,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,  
+  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -23,7 +23,9 @@ import { useState } from "react";
 import { CreateModelForm } from "../form/Form";
 
 export function DropdownActions({ model }: { model: Model }) {
+  const show = useDialogUpdateStore((state) => state.show);
   const hideDialog = useDialogUpdateStore((state) => state.hideDialog);
+  const showDialog = useDialogUpdateStore((state) => state.showDialog);
   const [isUpdate, setIsUpdate] = useState(true);
 
   return (
@@ -39,35 +41,49 @@ export function DropdownActions({ model }: { model: Model }) {
           <DropdownMenuLabel>Ações</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DialogTrigger asChild>
-            <DropdownMenuItem onClick={() => setIsUpdate(true)}>
+            <DropdownMenuItem
+              onClick={() => {
+                setIsUpdate(true);
+                showDialog();
+              }}
+            >
               <Pencil size={4} />
               <span>Editar</span>
             </DropdownMenuItem>
           </DialogTrigger>
           <DialogTrigger asChild>
-            <DropdownMenuItem onClick={() => setIsUpdate(false)}>
+            <DropdownMenuItem
+              onClick={() => {
+                setIsUpdate(false);
+                showDialog();
+              }}
+            >
               <Trash2 size={4} />
               <span>Excluir</span>
             </DropdownMenuItem>
           </DialogTrigger>
         </DropdownMenuContent>
       </DropdownMenu>
-      <DialogContent>
-        {isUpdate ? (
-          <DialogHeader>
-            <DialogTitle>Atualizar Modelo</DialogTitle>
-            <DialogDescription>
-              Edite as informações abaixo e clique em salvar para atualizar as
-              informações do registro.
-            </DialogDescription>
+      {show && (
+        <DialogContent>
+          {isUpdate ? (
             <div>
-              <CreateModelForm data={model} hideDialog={hideDialog} />
+              <DialogHeader>
+                <DialogTitle>Atualizar Modelo</DialogTitle>
+                <DialogDescription>
+                  Edite as informações abaixo e clique em salvar para atualizar
+                  as informações do registro.
+                </DialogDescription>
+              </DialogHeader>
+              <div>
+                <CreateModelForm data={model} hideDialog={hideDialog} />
+              </div>
             </div>
-          </DialogHeader>
-        ) : (
-          <DialogDelete model={model} hideDialog={hideDialog} />
-        )}
-      </DialogContent>
+          ) : (
+            <DialogDelete model={model} hideDialog={hideDialog} />
+          )}
+        </DialogContent>
+      )}
     </Dialog>
   );
 }

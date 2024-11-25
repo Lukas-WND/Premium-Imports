@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useMutation } from "@tanstack/react-query";
 import { createModel, updateModel } from "../../data/queries";
 import { useToast } from "@/hooks/use-toast";
+import { queryClient } from "@/lib/react-query";
 
 export function CreateModelForm({
   data,
@@ -16,13 +17,13 @@ export function CreateModelForm({
   data?: Model;
   hideDialog: () => void;
 }) {
-  const { toast } = useToast()
+  const { toast } = useToast();
   const addModel = useModelStore((state) => state.addModelInList);
 
   const modelSchema = z.object({
     modelId: z.string().optional(),
     modelName: z.string().min(1, "O campo Nome do Modelo é obrigatório"),
-    modelYear: z.string().min(1, "O campo Ano do Modelo é obrigatório"),
+    modelYear: z.coerce.number().min(1, "O campo Ano do Modelo é obrigatório"),
   });
 
   const newModel = useMutation({
@@ -32,17 +33,18 @@ export function CreateModelForm({
       addModel(createdModel);
       toast({
         title: "Modelo Criado com sucesso!",
-        description: "Novo modelo foi registrado com sucesso na base de dados do sistema!",
-        style: {backgroundColor: "green", color: "white"}
-      })
+        description:
+          "Novo modelo foi registrado com sucesso na base de dados do sistema!",
+        style: { backgroundColor: "green", color: "white" },
+      });
     },
     onError: (err) => {
       toast({
         title: "Erro ao criar novo modelo!",
         description: `${err.message}`,
-        variant: "destructive"
-      })
-    }
+        variant: "destructive",
+      });
+    },
   });
 
   const uptModel = useMutation({
@@ -54,20 +56,21 @@ export function CreateModelForm({
       updates: Partial<Omit<Model, "modelId">>;
     }) => updateModel(modelId, updates),
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["models"] });
       hideDialog();
       toast({
         title: "Modelo atualizado com sucesso!",
         description: `O modelo ${data?.modelName} foi atualizado com sucesso na base de dados do sistema!`,
-        style: {backgroundColor: "green", color: "white"}
-      })
+        style: { backgroundColor: "green", color: "white" },
+      });
     },
     onError: (err) => {
       toast({
         title: "Erro ao atualizar o modelo!",
         description: `${err.message}`,
-        variant: "destructive"
-      })
-    }
+        variant: "destructive",
+      });
+    },
   });
 
   const handleCreateModel: SubmitHandler<z.infer<typeof modelSchema>> = (
