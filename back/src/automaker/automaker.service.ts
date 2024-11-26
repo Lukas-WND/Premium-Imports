@@ -29,10 +29,6 @@ export class AutomakerService {
   async findAll() {
     const automakers = await this.automakerRepository.find();
 
-    if (!automakers.length) {
-      throw new NotFoundException('Não foram encontrados registros de montadoras.');
-    }
-
     return automakers;
   }
 
