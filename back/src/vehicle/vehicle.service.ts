@@ -57,7 +57,9 @@ export class VehicleService {
    * @returns Lista de veículos ou uma exceção caso não existam registros.
    */
   async findAll() {
-    const vehicles = await this.vehicleRepository.find({relations: ['modelId']});
+    const vehicles = await this.vehicleRepository.find({
+      relations: ['modelId'],
+    });
 
     if (!vehicles.length) {
       throw new NotFoundException(
@@ -86,9 +88,33 @@ export class VehicleService {
   async update(id: string, updateVehicleDto: UpdateVehicleDto) {
     const vehicle = await this.findVehicleByIdOrFail(id);
 
-    // Atualiza somente os campos fornecidos
-    // this.vehicleRepository.merge(vehicle, updateVehicleDto);
+    let model: Model | undefined;
 
+    // Se um novo `modelId` for fornecido, busca o modelo correspondente.
+    if (updateVehicleDto.modelId) {
+      model = await this.modelService.findOne(updateVehicleDto.modelId);
+
+      if (!model) {
+        throw new NotFoundException(
+          `Modelo com o ID ${updateVehicleDto.modelId} não encontrado.`,
+        );
+      }
+    }
+    // Se o `modelId` não foi fornecido, mas o nome e o ano do modelo foram fornecidos, cria um novo modelo.
+    else if (updateVehicleDto.modelName && updateVehicleDto.modelYear) {
+      model = await this.modelService.create({
+        modelName: updateVehicleDto.modelName,
+        modelYear: updateVehicleDto.modelYear,
+      });
+    }
+
+    // Atualiza o veículo, substituindo o `modelId` pelo modelo encontrado ou criado, se necessário.
+    this.vehicleRepository.merge(vehicle, {
+      ...updateVehicleDto,
+      modelId: model ?? vehicle.modelId, // Mantém o modelo atual se nenhum novo for fornecido.
+    });
+
+    // Salva as alterações no banco de dados.
     return this.vehicleRepository.save(vehicle);
   }
 
@@ -108,7 +134,9 @@ export class VehicleService {
    * @returns O veículo encontrado.
    */
   private async findVehicleByIdOrFail(id: string): Promise<Vehicle> {
-    const vehicle = await this.vehicleRepository.findOne({ where: {vehicleId: id} });
+    const vehicle = await this.vehicleRepository.findOne({
+      where: { vehicleId: id },
+    });
 
     if (!vehicle) {
       throw new NotFoundException(
