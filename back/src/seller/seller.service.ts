@@ -29,10 +29,6 @@ export class SellerService {
   async findAll() {
     const sellers = await this.sellerRepository.find();
 
-    if (!sellers.length) {
-      throw new NotFoundException('Não foram encontrados registros de vendedores.');
-    }
-
     return sellers;
   }
 
