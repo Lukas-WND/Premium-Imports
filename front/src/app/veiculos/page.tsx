@@ -1,7 +1,12 @@
-export default function VeiculosPage() {
-  return (
-    <section>
-      <h1 className="font-semibold text-3xl">Veículos</h1>
-    </section>
-  );
+import { ModelTable } from "./components/table/Table";
+
+export default function ModelosPage() {
+    return (
+        <section>
+            <h1 className="text-2xl font-semibold">Veiculos</h1>
+            <div className="mt-10">
+                <ModelTable />
+            </div>
+        </section>
+    )
 }

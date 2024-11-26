@@ -103,7 +103,7 @@ export class PurchaseService {
 
     if (updatePurchaseDto.vehicle) {
       const updatedVehicle = await this.vehicleService.update(
-        purchase.vehicle.id,
+        purchase.vehicle.vehicleId,
         updatePurchaseDto.vehicle,
       );
       purchase.vehicle = updatedVehicle;

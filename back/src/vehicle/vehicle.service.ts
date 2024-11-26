@@ -108,7 +108,7 @@ export class VehicleService {
    * @returns O veículo encontrado.
    */
   private async findVehicleByIdOrFail(id: string): Promise<Vehicle> {
-    const vehicle = await this.vehicleRepository.findOne({ where: { id } });
+    const vehicle = await this.vehicleRepository.findOne({ where: {vehicleId: id} });
 
     if (!vehicle) {
       throw new NotFoundException(

@@ -17,7 +17,7 @@
   @Entity()
   export class Vehicle {
     @PrimaryGeneratedColumn('uuid')
-    id: string;
+    vehicleId: string;
 
     @Column({ nullable: false, unique: true })
     chassisNumber: string;
