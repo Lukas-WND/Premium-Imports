@@ -16,7 +16,6 @@ export function CreateModel() {
   const showDialog = useDialogCreateStore((state) => state.showDialog);
   const hideDialog = useDialogCreateStore((state) => state.hideDialog);
 
-  console.log(show);
   return (
     <Dialog
       onOpenChange={(open) => {

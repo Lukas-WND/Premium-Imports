@@ -59,7 +59,6 @@ export function DialogDelete({
         <Button
           variant="destructive"
           onClick={() => {
-            console.log(model);
             deleteModelFn(model.modelId);
           }}
         >
