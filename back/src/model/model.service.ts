@@ -34,12 +34,6 @@ export class ModelService {
   async findAll() {
     const models = await this.modelRepository.find();
 
-    if (!models.length) {
-      throw new NotFoundException(
-        'Não foram encontrados registros de modelos.',
-      );
-    }
-
     return models;
   }
 

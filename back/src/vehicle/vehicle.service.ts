@@ -61,12 +61,6 @@ export class VehicleService {
       relations: ['modelId'],
     });
 
-    if (!vehicles.length) {
-      throw new NotFoundException(
-        'Não foram encontrados registros de veículos.',
-      );
-    }
-
     return vehicles;
   }
 
