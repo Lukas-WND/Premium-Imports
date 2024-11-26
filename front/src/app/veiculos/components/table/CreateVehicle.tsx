@@ -7,11 +7,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { CreateModelForm } from "../form/Form";
+import { CreateVehicleForm } from "../form/Form";
 import { useDialogCreateStore } from "../store/dialogCreateStore";
 import { Plus } from "lucide-react";
 
-export function CreateModel() {
+export function CreateVehicle() {
   const show = useDialogCreateStore((state) => state.show);
   const showDialog = useDialogCreateStore((state) => state.showDialog);
   const hideDialog = useDialogCreateStore((state) => state.hideDialog);
@@ -28,19 +28,19 @@ export function CreateModel() {
       <DialogTrigger asChild>
         <Button onClick={() => showDialog()}>
           <Plus size={4} />
-          Novo Modelo
+          Novo Veículo
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Novo Modelo</DialogTitle>
+          <DialogTitle>Novo Veículo</DialogTitle>
           <DialogDescription>
-            Preencha os campos abaixo para adicionar um novo registro de modelo
+            Preencha os campos abaixo para adicionar um novo registro de veículo
             ao sistema.
           </DialogDescription>
         </DialogHeader>
         <div>
-          <CreateModelForm hideDialog={hideDialog}/>
+          <CreateVehicleForm hideDialog={hideDialog} />
         </div>
       </DialogContent>
     </Dialog>

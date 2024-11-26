@@ -18,9 +18,10 @@ import {
 import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { DialogDelete } from "./DialogDelete";
 import { useState } from "react";
-import { CreateModelForm } from "../form/Form";
+import { CreateVehicleForm } from "../form/Form";
+import { Vehicle } from "@/app/stores/vehicleStore";
 
-export function DropdownActions({ model }: { model: Model }) {
+export function DropdownActions({ vehicle }: { vehicle: Vehicle }) {
   const [component, setComponent] = useState<"update" | "delete">("update");
   const [show, setShow] = useState(false);
 
@@ -79,10 +80,10 @@ export function DropdownActions({ model }: { model: Model }) {
               Edite as informações abaixo e clique em salvar para atualizar as
               informações do registro.
             </DialogDescription>
-            <CreateModelForm data={model} hideDialog={hideDialog} />
+            <CreateVehicleForm data={vehicle} hideDialog={hideDialog} />
           </DialogHeader>
         ) : (
-          <DialogDelete model={model} hideDialog={hideDialog} />
+          <DialogDelete vehicle={vehicle} hideDialog={hideDialog} />
         )}
       </DialogContent>
     </Dialog>

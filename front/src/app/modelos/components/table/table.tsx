@@ -29,7 +29,7 @@ export function ModelTable() {
       {isLoading ? (
         <TableSkeleton />
       ) : (
-        <DataTable columns={columns} data={modelList} actionComponent={CreateModel} paginate={15}/>
+        <DataTable columns={columns} data={modelList} actionComponent={CreateModel} paginate={10}/>
       )}
     </div>
   );

@@ -2,34 +2,34 @@
 
 import { useEffect } from "react";
 import { columns } from "./columns";
-import { getModels } from "../../data/queries";
+import { getVehicles } from "../../data/queries";
 import { useQuery } from "@tanstack/react-query";
 import DataTable from "@/components/utils/DataTable";
-import { useModelStore } from "@/app/stores/modelStore";
+import { useVehicleStore } from "@/app/stores/vehicleStore";
 import TableSkeleton from "@/components/utils/TableSkeleton";
-import { CreateModel } from "./CreateModel";
+import { CreateVehicle } from "./CreateVehicle";
 
 export function ModelTable() {
-  const setModelList = useModelStore((state) => state.setModelList);
-  const modelList = useModelStore((state) => state.modelList);
+  const setVehicleList = useVehicleStore((state) => state.setVehicleList);
+  const vehicleList = useVehicleStore((state) => state.vehicleList);
 
-  const { data: models, isLoading } = useQuery({
-    queryKey: ["models"],
-    queryFn: getModels,
+  const { data: vehicles, isLoading } = useQuery({
+    queryKey: ["vehicles"],
+    queryFn: getVehicles,
   });
 
   useEffect(() => {
-    if (models) {
-      setModelList(models);
+    if (vehicles) {
+      setVehicleList(vehicles);
     }
-  }, [models, setModelList]);
+  }, [vehicles, setVehicleList]);
 
   return (
     <div>
       {isLoading ? (
         <TableSkeleton />
       ) : (
-        <DataTable columns={columns} data={modelList} actionComponent={CreateModel} paginate={15}/>
+        <DataTable columns={columns} data={vehicleList} actionComponent={CreateVehicle} paginate={15}/>
       )}
     </div>
   );

@@ -8,25 +8,25 @@ import {
 } from "@/components/ui/dialog";
 
 import { useToast } from "@/hooks/use-toast";
-import { deleteModel } from "../../data/queries";
+import { deleteVehicle } from "../../data/queries";
 import { useMutation } from "@tanstack/react-query";
-import { Model, useModelStore } from "@/app/stores/modelStore";
+import { useVehicleStore, Vehicle } from "@/app/stores/vehicleStore";
 
 export function DialogDelete({
-  model,
+  vehicle,
   hideDialog,
 }: {
-  model: Model;
+  vehicle: Vehicle;
   hideDialog: () => void;
 }) {
   const { toast } = useToast();
-  const removeModel = useModelStore((state) => state.removeModelInList);
+  const removeVehicle = useVehicleStore((state) => state.removeVehicleInList);
 
-  const { mutate: deleteModelFn } = useMutation({
-    mutationFn: (id: string) => deleteModel(id),
+  const { mutate: deleteVehicleFn } = useMutation({
+    mutationFn: (id: string) => deleteVehicle(id),
     onSuccess() {
       hideDialog();
-      removeModel(model.modelId);
+      removeVehicle(vehicle.vehicleId);
       toast({
         title: "Modelo deletado com sucesso",
         description:
@@ -46,7 +46,7 @@ export function DialogDelete({
   return (
     <>
       <DialogHeader>
-        <DialogTitle>Deletar Modelo</DialogTitle>
+        <DialogTitle>Deletar Veículo</DialogTitle>
         <DialogDescription>
           Tem certeza que deseja deletar esse registro do sistema? Essa ação não
           pode ser desfeita!
@@ -59,7 +59,7 @@ export function DialogDelete({
         <Button
           variant="destructive"
           onClick={() => {
-            deleteModelFn(model.modelId);
+            deleteVehicleFn(vehicle.vehicleId);
           }}
         >
           Deletar

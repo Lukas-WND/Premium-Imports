@@ -1,23 +1,46 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { DropdownActions } from "./DropdownActions";
 import { Model } from "../../../stores/modelStore";
+import { Vehicle } from "@/app/stores/vehicleStore";
 
-export const columns: ColumnDef<Model>[] = [
+export const columns: ColumnDef<Vehicle>[] = [
   {
-    accessorKey: "modelName",
+    accessorKey: "model",
     header: "Modelo",
+    cell: ({row}) => {
+      const vehicle = row.original;
+      console.log(vehicle)
+
+      return `${vehicle.modelId?.modelName} ${vehicle.modelId?.modelYear}`
+    }
   },
   {
-    accessorKey: "modelYear",
-    header: "Ano",
+    accessorKey: "chassisNumber",
+    header: "Num. Chassi",
+  },
+  {
+    accessorKey: "color",
+    header: "Color",
+  },
+  {
+    accessorKey: "fabricatingYear",
+    header: "Ano de Fabricação",
+  },
+  {
+    accessorKey: "plate",
+    header: "Placa",
+  },
+  {
+    accessorKey: "price",
+    header: "Preço",
   },
   {
     id: "actions",
 
     cell: ({ row }) => {
-      const model = row.original;
+      const vehicle = row.original;
 
-      return <DropdownActions model={model} />;
+      return <DropdownActions vehicle={vehicle} />;
     },
   },
 ];

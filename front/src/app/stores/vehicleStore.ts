@@ -4,11 +4,22 @@ import { Model } from "./modelStore";
 export type Vehicle = {
   vehicleId: string;
   chassisNumber: string;
-  plate: string; 
+  plate: string;
   fabricatingYear: number;
   color: string;
   price: number;
-  modelId: Model; 
+  modelId: Model;
+};
+
+export type ToCreateOrUpdateVehicle = {
+  chassisNumber: string;
+  plate: string;
+  fabricatingYear: number;
+  color: string;
+  price: number;
+  modelId?: string;
+  modelName?: string;
+  modelYear?: number;
 };
 
 export type Actions = {
