@@ -16,8 +16,11 @@ export class Client {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'bigint', nullable: false, unique: true })
-  cpf: number;
+  @Column({ nullable: false, unique: true })
+  cpf: string;
+
+  @Column({nullable: false})
+  name: string;
 
   @Column()
   neighborhood: string;
@@ -28,7 +31,7 @@ export class Client {
   @Column()
   state: string;
 
-  @Column({ length: 11 })
+  @Column({ length: 11, nullable: true })
   homePhone: string;
 
   @Column({ length: 11 })

@@ -29,10 +29,6 @@ export class ClientService {
   async findAll() {
     const clients = await this.clientRepository.find();
 
-    if (!clients.length) {
-      throw new NotFoundException('Não foram encontrados registros de clientes.');
-    }
-
     return clients;
   }
 

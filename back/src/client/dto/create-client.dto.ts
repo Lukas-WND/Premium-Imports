@@ -1,8 +1,10 @@
 export class CreateClientDto {
-  cpf: number;
+  cpf: string;
+  name: string;
   neighborhood: string;
   city: string;
   state: string;
-  homePhone: string;
+  homePhone?: string;
+  cellPhone: string;
   income: number;
 }
