@@ -9,7 +9,7 @@ import { useMutation } from "@tanstack/react-query";
 import { queryClient } from "@/lib/react-query";
 import { Client, useClientStore } from "@/app/stores/clientStore";
 import { createClient, updateClient } from "../../data/queries";
-import { validateCPF } from "@/utils/validaCpf";
+import { validateCPF } from "@/utils/CPFValidation";
 
 export function CreateClientForm({
   data,
