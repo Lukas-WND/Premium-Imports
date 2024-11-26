@@ -29,14 +29,14 @@ export function CreateModelForm({
   const newModel = useMutation({
     mutationFn: createModel,
     onSuccess: (createdModel: Model) => {
-      hideDialog();
       addModel(createdModel);
       toast({
         title: "Modelo Criado com sucesso!",
         description:
-          "Novo modelo foi registrado com sucesso na base de dados do sistema!",
+        "Novo modelo foi registrado com sucesso na base de dados do sistema!",
         style: { backgroundColor: "green", color: "white" },
       });
+      hideDialog();
     },
     onError: (err) => {
       toast({
@@ -141,7 +141,7 @@ export function CreateModelForm({
         <Button type="submit" disabled={isLoading}>
           Salvar
         </Button>
-        <Button variant="outline" type="button">
+        <Button variant="outline" type="button" onClick={hideDialog}>
           Cancelar
         </Button>
       </div>

@@ -19,17 +19,36 @@ import {
 import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { DialogDelete } from "./DialogDelete";
 import { useDialogUpdateStore } from "../store/dialogUpdateStore";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CreateModelForm } from "../form/Form";
 
 export function DropdownActions({ model }: { model: Model }) {
-  const show = useDialogUpdateStore((state) => state.show);
-  const hideDialog = useDialogUpdateStore((state) => state.hideDialog);
-  const showDialog = useDialogUpdateStore((state) => state.showDialog);
-  const [isUpdate, setIsUpdate] = useState(true);
+  // const show = useDialogUpdateStore((state) => state.show);
+  const component = useDialogUpdateStore((state) => state.component);
+  // const hideDialog = useDialogUpdateStore((state) => state.hideDialog);
+  // const showDialog = useDialogUpdateStore((state) => state.showDialog);
+  const setComponet = useDialogUpdateStore((state) => state.setComponent);
+  const [show, setShow] = useState(false);
+
+  const hideDialog = () => {
+    setShow(false);
+  };
+
+  const showDialog = () => {
+    setShow(true);
+  };
+
+  // console.log(show);
 
   return (
-    <Dialog>
+    <Dialog
+      open={show}
+      onOpenChange={(open) => {
+        if (!open) {
+          hideDialog();
+        }
+      }}
+    >
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="aspect-square p-0">
@@ -40,50 +59,40 @@ export function DropdownActions({ model }: { model: Model }) {
         <DropdownMenuContent>
           <DropdownMenuLabel>Ações</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DialogTrigger asChild>
-            <DropdownMenuItem
-              onClick={() => {
-                setIsUpdate(true);
-                showDialog();
-              }}
-            >
-              <Pencil size={4} />
-              <span>Editar</span>
-            </DropdownMenuItem>
-          </DialogTrigger>
-          <DialogTrigger asChild>
-            <DropdownMenuItem
-              onClick={() => {
-                setIsUpdate(false);
-                showDialog();
-              }}
-            >
-              <Trash2 size={4} />
-              <span>Excluir</span>
-            </DropdownMenuItem>
-          </DialogTrigger>
+          <DropdownMenuItem
+            onClick={() => {
+              showDialog();
+              setComponet("update");
+            }}
+          >
+            <Pencil size={4} />
+            <span>Editar</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => {
+              setComponet("delete");
+              showDialog();
+            }}
+          >
+            <Trash2 size={4} />
+            <span>Excluir</span>
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      {show && (
-        <DialogContent>
-          {isUpdate ? (
-            <div>
-              <DialogHeader>
-                <DialogTitle>Atualizar Modelo</DialogTitle>
-                <DialogDescription>
-                  Edite as informações abaixo e clique em salvar para atualizar
-                  as informações do registro.
-                </DialogDescription>
-              </DialogHeader>
-              <div>
-                <CreateModelForm data={model} hideDialog={hideDialog} />
-              </div>
-            </div>
-          ) : (
-            <DialogDelete model={model} hideDialog={hideDialog} />
-          )}
-        </DialogContent>
-      )}
+      <DialogContent>
+        {component == "update" ? (
+          <DialogHeader>
+            <DialogTitle>Atualizar Modelo</DialogTitle>
+            <DialogDescription>
+              Edite as informações abaixo e clique em salvar para atualizar as
+              informações do registro.
+            </DialogDescription>
+            <CreateModelForm data={model} hideDialog={hideDialog} />
+          </DialogHeader>
+        ) : (
+          <DialogDelete model={model} hideDialog={hideDialog} />
+        )}
+      </DialogContent>
     </Dialog>
   );
 }
