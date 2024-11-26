@@ -134,6 +134,9 @@ export function CreateVehicleForm({
   const handleUpdateModel: SubmitHandler<z.infer<typeof vehicleSchema>> = (
     vehicle
   ) => {
+    if(vehicle.modelId === "no_model") {
+      delete vehicle.modelId
+    }
     uptVehicle.mutate(vehicle);
   };
 
