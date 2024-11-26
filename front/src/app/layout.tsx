@@ -48,6 +48,7 @@ export default function RootLayout({
                   <Link href={"/modelos"}>Modelos</Link>
                   <Link href={"/montadoras"}>Montadoras</Link>
                   <Link href={"/clientes"}>Clientes</Link>
+                  <Link href={"/vendedores"}>Vendedores</Link>
                 </nav>
               </div>
               <div>Buscar</div>
