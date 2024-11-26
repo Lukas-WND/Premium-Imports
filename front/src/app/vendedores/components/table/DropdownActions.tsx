@@ -74,7 +74,7 @@ export function DropdownActions({ seller }: { seller: Seller }) {
       <DialogContent>
         {component == "update" ? (
           <DialogHeader>
-            <DialogTitle>Atualizar Cliente</DialogTitle>
+            <DialogTitle>Atualizar Vendedor</DialogTitle>
             <DialogDescription>
               Edite as informações abaixo e clique em salvar para atualizar as
               informações do registro.

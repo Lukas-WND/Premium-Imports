@@ -50,7 +50,7 @@ export function CreateSellerForm({
   const uptSeller = useMutation({
     mutationFn: (seller: Seller) => updateSeller(seller.id, seller),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["clients"] });
+      queryClient.invalidateQueries({ queryKey: ["sellers"] });
       hideDialog();
       toast({
         title: "Cliente atualizado com sucesso!",
@@ -115,7 +115,7 @@ export function CreateSellerForm({
           <p>Matrícula</p>
           <Input
             className="mt-2"
-            placeholder="CPF"
+            placeholder="Matrícula..."
             {...register("registration")}
           />
           {errors.registration && (

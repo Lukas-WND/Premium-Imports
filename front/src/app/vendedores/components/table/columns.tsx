@@ -17,7 +17,7 @@ export const columns: ColumnDef<Seller>[] = [
     cell: ({ row }) => {
       const seller = row.original;
 
-      // return <DropdownActions client={client} />;
+      return <DropdownActions seller={seller} />;
     },
   },
 ];
