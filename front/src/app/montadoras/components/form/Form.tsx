@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { queryClient } from "@/lib/react-query";
-import { Automaker } from "@/app/stores/automakerStore";
+import { Automaker, useAutomakerStore } from "@/app/stores/automakerStore";
 import { createAutomaker, updateAutomaker } from "../../data/queries";
 import { validateCNPJ } from "@/utils/CNPJvalidation";
 
@@ -19,6 +19,9 @@ export function CreateAutomakerForm({
   hideDialog: () => void;
 }) {
   const { toast } = useToast();
+  const addAutomakerInList = useAutomakerStore(
+    (state) => state.addAutomakerInList
+  );
 
   const automakerSchema = z.object({
     id: z.string().optional(),
@@ -31,17 +34,24 @@ export function CreateAutomakerForm({
       }),
     corporateName: z.string().min(1, "O campo Razão Social é obrigatório"),
     brand: z.string().min(1, "O campo Marca é obrigatório"),
-    email: z.string().email("Email inválido").min(1, "O campo Email é obrigatório"),
-    businessPhone: z.string().min(1, "O campo Telefone Comercial é obrigatório"),
+    email: z
+      .string()
+      .email("Email inválido")
+      .min(1, "O campo Email é obrigatório"),
+    businessPhone: z
+      .string()
+      .min(1, "O campo Telefone Comercial é obrigatório"),
     cellPhone: z.string(),
   });
 
   const newAutomaker = useMutation({
     mutationFn: createAutomaker,
     onSuccess: (createdAutomaker: Automaker) => {
+      addAutomakerInList(createdAutomaker);
       toast({
         title: "Montadora criada com sucesso!",
-        description: "Nova montadora foi registrada com sucesso na base de dados!",
+        description:
+          "Nova montadora foi registrada com sucesso na base de dados!",
         style: { backgroundColor: "green", color: "white" },
       });
       hideDialog();
@@ -56,7 +66,8 @@ export function CreateAutomakerForm({
   });
 
   const uptAutomaker = useMutation({
-    mutationFn: (automaker: Automaker) => updateAutomaker(automaker.id, automaker),
+    mutationFn: (automaker: Automaker) =>
+      updateAutomaker(automaker.id, automaker),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["automakers"] });
       hideDialog();
@@ -64,7 +75,7 @@ export function CreateAutomakerForm({
         title: "Montadora atualizada com sucesso!",
         description: `A montadora ${data?.corporateName} foi atualizada com sucesso!`,
         // style: { backgroundColor: "green", color: "white" },
-        className: "bg-emerald-600 text-white"
+        className: "bg-emerald-600 text-white",
       });
     },
     onError: (err) => {
@@ -76,15 +87,15 @@ export function CreateAutomakerForm({
     },
   });
 
-  const handleCreateAutomaker: SubmitHandler<z.infer<typeof automakerSchema>> = (
-    automaker
-  ) => {
+  const handleCreateAutomaker: SubmitHandler<
+    z.infer<typeof automakerSchema>
+  > = (automaker) => {
     newAutomaker.mutate(automaker);
   };
 
-  const handleUpdateAutomaker: SubmitHandler<z.infer<typeof automakerSchema>> = (
-    automaker
-  ) => {
+  const handleUpdateAutomaker: SubmitHandler<
+    z.infer<typeof automakerSchema>
+  > = (automaker) => {
     const id = automaker?.id || "";
     uptAutomaker.mutate({ ...automaker, id: id });
   };
@@ -109,7 +120,9 @@ export function CreateAutomakerForm({
   return (
     <form
       className="flex flex-col gap-4"
-      onSubmit={handleSubmit(data ? handleUpdateAutomaker : handleCreateAutomaker)}
+      onSubmit={handleSubmit(
+        data ? handleUpdateAutomaker : handleCreateAutomaker
+      )}
     >
       <Label className="w-full">
         <p>CNPJ</p>
