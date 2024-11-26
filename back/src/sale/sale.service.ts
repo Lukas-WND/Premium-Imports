@@ -91,10 +91,6 @@ export class SaleService {
       relations: ['client', 'seller', 'vehicle', 'vehicle.model'],
     });
 
-    if (!sales.length) {
-      throw new NotFoundException('Nenhuma venda encontrada.');
-    }
-
     return sales;
   }
 

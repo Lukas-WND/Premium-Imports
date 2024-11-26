@@ -7,10 +7,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { queryClient } from "@/lib/react-query";
-import { Client, useClientStore } from "@/app/stores/clientStore";
+import { useSaleStore } from "@/app/stores/saleStore";
 import { createSale, updateSale } from "../../data/queries";
-import { validateCPF } from "@/utils/CPFValidation";
-import { Sale } from "@/app/stores/saleStore";
+import { Sale, SaleToCreate, SaleToUpdate } from "@/app/stores/saleStore";
 
 export function CreateSaleForm({
   data,
@@ -20,209 +19,200 @@ export function CreateSaleForm({
   hideDialog: () => void;
 }) {
   const { toast } = useToast();
-  const addClient = useClientStore((state) => state.addClientInList);
+  const addSale = useSaleStore((state) => state.addSaleInList);
 
-  const clientSchema = z.object({
+  const saleSchema = z.object({
     id: z.string().optional(),
-    name: z.string().min(1, "O campo Nome é obrigatório"),
-    cpf: z
-      .string()
-      .min(11, "O campo CPF deve ter 11 dígitos")
-      .max(11, "O campo CPF deve ter 11 dígitos")
-      .refine(validateCPF, {
-        message: "CPF inválido",
-      }),
-    state: z.string().min(1, "O campo Estado é obrigatório"),
-    city: z.string().min(1, "O campo Cidade é obrigatório"),
-    neighborhood: z.string().min(1, "O campo Bairro é obrigatório"),
-    income: z.coerce.number().min(1, "O campo Renda é obrigatório"),
-    cellPhone: z.string().min(1, "O campo Telefone Celular é obrigatório"),
-    homePhone: z.string().optional(),
+    saleCode: z.string().min(1, "O código da venda é obrigatório"),
+    saleDate: z.date({ required_error: "A data da venda é obrigatória" }),
+    entryValue: z.number().min(0, "O valor de entrada deve ser positivo"),
+    financedAmount: z.number().optional(),
+    totalAmount: z.string().min(1, "O valor total é obrigatório"),
+    client: z.string().min(1, "O cliente é obrigatório"),
+    seller: z.string().min(1, "O vendedor é obrigatório"),
+    vehicle: z.string().min(1, "O veículo é obrigatório"),
   });
 
-  const newClient = useMutation({
-    mutationFn: createClient,
-    onSuccess: (createdClient: Client) => {
-      addClient(createdClient);
+  const newSale = useMutation({
+    mutationFn: createSale,
+    onSuccess: (createdSale: Sale) => {
+      addSale(createdSale);
       toast({
-        title: "Cliente criado com sucesso!",
+        title: "Venda registrada com sucesso!",
         description:
-          "Novo cliente foi registrado com sucesso na base de dados do sistema!",
+          "A nova venda foi adicionada à base de dados do sistema.",
         style: { backgroundColor: "green", color: "white" },
       });
       hideDialog();
     },
     onError: (err) => {
       toast({
-        title: "Erro ao criar novo cliente!",
+        title: "Erro ao registrar venda!",
         description: `${err.message}`,
         variant: "destructive",
       });
     },
   });
 
-  const uptClient = useMutation({
-    mutationFn: (client: Client) => updateClient(client.id, client),
+  const uptSale = useMutation({
+    mutationFn: (sale: SaleToUpdate) => updateSale(sale.id, sale),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["clients"] });
-      hideDialog();
+      queryClient.invalidateQueries({ queryKey: ["sales"] });
       toast({
-        title: "Cliente atualizado com sucesso!",
-        description: `O cliente ${data?.name} foi atualizado com sucesso na base de dados do sistema!`,
+        title: "Venda atualizada com sucesso!",
+        description: `A venda foi atualizada na base de dados.`,
         style: { backgroundColor: "green", color: "white" },
       });
+      hideDialog();
     },
     onError: (err) => {
       toast({
-        title: "Erro ao atualizar o cliente!",
+        title: "Erro ao atualizar venda!",
         description: `${err.message}`,
         variant: "destructive",
       });
     },
   });
 
-  const handleCreateClient: SubmitHandler<z.infer<typeof clientSchema>> = (
-    client
-  ) => {
-    newClient.mutate(client);
+  const handleCreateSale: SubmitHandler<z.infer<typeof saleSchema>> = (sale) => {
+    newSale.mutate(sale as SaleToCreate);
   };
 
-  const handleUpdateClient: SubmitHandler<z.infer<typeof clientSchema>> = (
-    client
-  ) => {
-    const id = client?.id || "";
-    uptClient.mutate({ ...client, id: id });
+  const handleUpdateSale: SubmitHandler<z.infer<typeof saleSchema>> = (sale) => {
+    uptSale.mutate({ ...sale, id: sale.id || "" });
   };
 
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<z.infer<typeof clientSchema>>({
-    resolver: zodResolver(clientSchema),
+  } = useForm<z.infer<typeof saleSchema>>({
+    resolver: zodResolver(saleSchema),
     defaultValues: {
       id: data?.id,
-      name: data?.name,
-      cpf: data?.cpf,
-      income: data?.income,
-      state: data?.state,
-      city: data?.city,
-      neighborhood: data?.neighborhood,
-      cellPhone: data?.cellPhone,
-      homePhone: data?.homePhone,
+      saleCode: data?.saleCode,
+      saleDate: data?.saleDate,
+      entryValue: data?.entryValue,
+      financedAmount: data?.financedAmount,
+      totalAmount: data?.totalAmount,
+      client: data?.client.id,
+      seller: data?.seller.id,
+      vehicle: data?.vehicle.vehicleId,
     },
   });
 
   return (
     <form
       className="flex flex-col gap-4"
-      onSubmit={handleSubmit(data ? handleUpdateClient : handleCreateClient)}
+      onSubmit={handleSubmit(data ? handleUpdateSale : handleCreateSale)}
     >
-      <div className="flex flex-col gap-4 mt-2">
-        <Label className="w-full">
-          <p>Nome</p>
-          <Input
-            className="mt-2"
-            placeholder="Nome completo..."
-            {...register("name")}
-          />
-          {errors.name && (
-            <p className="mt-1 text-red-500 text-end">{errors.name.message}</p>
-          )}
-        </Label>
+      <Label>
+        <p>Código da Venda</p>
+        <Input
+          className="mt-2"
+          placeholder="Código"
+          {...register("saleCode")}
+        />
+        {errors.saleCode && (
+          <p className="mt-1 text-red-500 text-end">
+            {errors.saleCode.message}
+          </p>
+        )}
+      </Label>
 
-        <Label className="w-full">
-          <p>CPF</p>
-          <Input className="mt-2" placeholder="CPF" {...register("cpf")} />
-          {errors.cpf && (
-            <p className="mt-1 text-red-500 text-end">{errors.cpf.message}</p>
-          )}
-        </Label>
+      <Label>
+        <p>Data da Venda</p>
+        <Input
+          className="mt-2"
+          type="date"
+          {...register("saleDate", { valueAsDate: true })}
+        />
+        {errors.saleDate && (
+          <p className="mt-1 text-red-500 text-end">
+            {errors.saleDate.message}
+          </p>
+        )}
+      </Label>
 
-        <div className="flex w-full gap-4">
-          <Label className="w-1/3">
-            <p>Estado</p>
-            <Input
-              className="mt-2"
-              placeholder="Estado"
-              {...register("state")}
-            />
-            {errors.state && (
-              <p className="mt-1 text-red-500 text-end">
-                {errors.state.message}
-              </p>
-            )}
-          </Label>
+      <Label>
+        <p>Valor de Entrada</p>
+        <Input
+          className="mt-2"
+          type="number"
+          placeholder="Valor de entrada"
+          {...register("entryValue")}
+        />
+        {errors.entryValue && (
+          <p className="mt-1 text-red-500 text-end">
+            {errors.entryValue.message}
+          </p>
+        )}
+      </Label>
 
-          <Label className="w-2/3">
-            <p>Cidade</p>
-            <Input
-              className="mt-2"
-              placeholder="Cidade"
-              {...register("city")}
-            />
-            {errors.city && (
-              <p className="mt-1 text-red-500 text-end">
-                {errors.city.message}
-              </p>
-            )}
-          </Label>
-        </div>
+      <Label>
+        <p>Valor Financiado (opcional)</p>
+        <Input
+          className="mt-2"
+          type="number"
+          placeholder="Valor financiado"
+          {...register("financedAmount")}
+        />
+      </Label>
 
-        <Label className="w-full">
-          <p>Bairro</p>
-          <Input
-            className="mt-2"
-            placeholder="Bairro"
-            {...register("neighborhood")}
-          />
-          {errors.neighborhood && (
-            <p className="mt-1 text-red-500 text-end">
-              {errors.neighborhood.message}
-            </p>
-          )}
-        </Label>
+      <Label>
+        <p>Valor Total</p>
+        <Input
+          className="mt-2"
+          type="text"
+          placeholder="Valor total"
+          {...register("totalAmount")}
+        />
+        {errors.totalAmount && (
+          <p className="mt-1 text-red-500 text-end">
+            {errors.totalAmount.message}
+          </p>
+        )}
+      </Label>
 
-        <Label className="w-full">
-          <p>Renda</p>
-          <Input className="mt-2" placeholder="Renda" {...register("income")} />
-          {errors.income && (
-            <p className="mt-1 text-red-500 text-end">
-              {errors.income.message}
-            </p>
-          )}
-        </Label>
+      <Label>
+        <p>Cliente</p>
+        <Input
+          className="mt-2"
+          type="text"
+          placeholder="ID do cliente"
+          {...register("client")}
+        />
+        {errors.client && (
+          <p className="mt-1 text-red-500 text-end">{errors.client.message}</p>
+        )}
+      </Label>
 
-        <div className="flex w-full gap-4">
-          <Label className="w-1/2">
-            <p>Telefone Celular</p>
-            <Input
-              className="mt-2"
-              placeholder="Celular"
-              {...register("cellPhone")}
-            />
-            {errors.cellPhone && (
-              <p className="mt-1 text-red-500 text-end">
-                {errors.cellPhone.message}
-              </p>
-            )}
-          </Label>
+      <Label>
+        <p>Vendedor</p>
+        <Input
+          className="mt-2"
+          type="text"
+          placeholder="ID do vendedor"
+          {...register("seller")}
+        />
+        {errors.seller && (
+          <p className="mt-1 text-red-500 text-end">{errors.seller.message}</p>
+        )}
+      </Label>
 
-          <Label className="w-1/2">
-            <p>Telefone Residencial</p>
-            <Input
-              className="mt-2"
-              placeholder="Telefone Residencial"
-              {...register("homePhone")}
-            />
-            {errors.homePhone && (
-              <p className="mt-1 text-red-500 text-end">
-                {errors.homePhone.message}
-              </p>
-            )}
-          </Label>
-        </div>
-      </div>
+      <Label>
+        <p>Veículo</p>
+        <Input
+          className="mt-2"
+          type="text"
+          placeholder="ID do veículo"
+          {...register("vehicle")}
+        />
+        {errors.vehicle && (
+          <p className="mt-1 text-red-500 text-end">{errors.vehicle.message}</p>
+        )}
+      </Label>
+
       <div className="flex items-center justify-end gap-2 mt-4">
         <Button type="submit" disabled={isSubmitting}>
           Salvar
