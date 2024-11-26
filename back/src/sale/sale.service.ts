@@ -88,7 +88,7 @@ export class SaleService {
    */
   async findAll(): Promise<Readonly<Sale[]>> {
     const sales = await this.saleRepository.find({
-      relations: ['client', 'seller', 'vehicle', 'vehicle.model'],
+      relations: ['client', 'seller', 'vehicle', 'vehicle.modelId'],
     });
 
     return sales;

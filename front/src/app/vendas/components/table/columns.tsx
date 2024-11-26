@@ -56,6 +56,11 @@ export const columns: ColumnDef<Sale>[] = [
   {
     accessorKey: "saleDate",
     header: "Data da Venda",
+    cell: ({row}) => {
+      const date = new Date(row.original.saleDate).toLocaleDateString("pt-BR");
+
+      return date
+    }
   },
   {
     id: "actions",
@@ -63,7 +68,7 @@ export const columns: ColumnDef<Sale>[] = [
     cell: ({ row }) => {
       const sale = row.original;
 
-      // return <DropdownActions client={client} />;
+      return <DropdownActions sale={sale} />;
     },
   },
 ];

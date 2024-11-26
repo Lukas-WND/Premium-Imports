@@ -44,6 +44,8 @@ export function CreateVehicleForm({
   const models: Model[] = useModelStore((state) => state.modelList);
   const setModels = useModelStore((state) => state.setModelList);
 
+  const [open, setOpen] = useState(false);
+
   useEffect(() => {
     if (models.length === 0) {
       queryClient
@@ -60,7 +62,7 @@ export function CreateVehicleForm({
           });
         });
     }
-  }, [models.length, setModels, toast]);
+  }, [models.length, setModels, toast, open]);
 
   const vehicleSchema = z
     .object({
@@ -167,8 +169,6 @@ export function CreateVehicleForm({
   });
   
   const selectedModel = models.find((e) => e.modelId == field.value);
-  
-  const [open, setOpen] = useState(false);
   
   console.log(field.value);
   return (

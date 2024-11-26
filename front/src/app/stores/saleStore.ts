@@ -9,7 +9,7 @@ export type Sale = {
   saleDate: Date;
   entryValue: number;
   financedAmount?: number;
-  totalAmount: string;
+  totalAmount: number;
   client: Client;
   seller: Seller;
   vehicle: Vehicle;
@@ -18,7 +18,7 @@ export type Sale = {
 export type SaleToCreate = {
   entryValue: number;
   financedAmount?: number;
-  totalAmount: string;
+  totalAmount: number;
   client: string;
   seller: string;
   vehicle: string;
@@ -29,7 +29,7 @@ export type SaleToUpdate = {
   saleDate?: Date;
   entryValue?: number;
   financedAmount?: number;
-  totalAmount?: string;
+  totalAmount?: number;
   client?: string;
   seller?: string;
   vehicle?: string;
