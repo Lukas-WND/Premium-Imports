@@ -54,11 +54,11 @@ export class SaleService {
    * @returns A venda criada.
    */
   async create(createSaleDto: CreateSaleDto): Promise<Sale> {
-    const { clientId, sellerId, vehicleId, financedAmount } = createSaleDto;
+    const { client, seller, vehicle, financedAmount } = createSaleDto;
 
-    const client = await this.clientService.findOne(clientId);
-    const seller = await this.sellerService.findOne(sellerId);
-    const vehicle = await this.vehicleService.findOne(vehicleId);
+    const clientId = await this.clientService.findOne(client);
+    const sellerId = await this.sellerService.findOne(seller);
+    const vehicleId = await this.vehicleService.findOne(vehicle);
 
     if (!client || !seller || !vehicle) {
       throw new BadRequestException(
@@ -67,16 +67,16 @@ export class SaleService {
     }
 
     if (financedAmount) {
-      await this.validateFinancing(financedAmount, clientId);
+      await this.validateFinancing(financedAmount, client);
     }
 
     const newSale = this.saleRepository.create({
       ...createSaleDto,
       saleCode: `SLE-${Date.now()}`,
       saleDate: new Date(),
-      client,
-      seller,
-      vehicle,
+      client: clientId,
+      seller: sellerId,
+      vehicle: vehicleId,
     });
 
     return this.saleRepository.save(newSale);
@@ -102,7 +102,7 @@ export class SaleService {
   async findOne(id: string): Promise<Sale> {
     const sale = await this.saleRepository.findOne({
       where: { id },
-      relations: ['client', 'seller', 'vehicle', 'vehicle.model'],
+      relations: ['client', 'seller', 'vehicle', 'vehicle.modelId'],
     });
 
     if (!sale) {
@@ -121,16 +121,16 @@ export class SaleService {
   async update(id: string, updateSaleDto: UpdateSaleDto): Promise<Sale> {
     const sale = await this.findOne(id);
 
-    if (updateSaleDto.clientId) {
-      sale.client = await this.clientService.findOne(updateSaleDto.clientId);
+    if (updateSaleDto.client) {
+      sale.client = await this.clientService.findOne(updateSaleDto.client);
     }
 
-    if (updateSaleDto.sellerId) {
-      sale.seller = await this.sellerService.findOne(updateSaleDto.sellerId);
+    if (updateSaleDto.seller) {
+      sale.seller = await this.sellerService.findOne(updateSaleDto.seller);
     }
 
-    if (updateSaleDto.vehicleId) {
-      sale.vehicle = await this.vehicleService.findOne(updateSaleDto.vehicleId);
+    if (updateSaleDto.vehicle) {
+      sale.vehicle = await this.vehicleService.findOne(updateSaleDto.vehicle);
     }
 
     Object.assign(sale, updateSaleDto);

@@ -38,7 +38,7 @@ export class ClientService {
    * @returns O cliente encontrado ou uma exceção.
    */
   async findOne(id: string) {
-    const client = await this.clientRepository.findOne({ where: { id } });
+    const client = await this.clientRepository.findOne({ where: { id: id } });
 
     if (!client) {
       throw new NotFoundException(`Cliente com o ID ${id} não encontrado.`);

@@ -129,7 +129,7 @@ export class VehicleService {
    */
   private async findVehicleByIdOrFail(id: string): Promise<Vehicle> {
     const vehicle = await this.vehicleRepository.findOne({
-      where: { vehicleId: id },
+      where: { vehicleId: id }, relations: ['modelId']
     });
 
     if (!vehicle) {

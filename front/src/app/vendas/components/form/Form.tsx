@@ -113,7 +113,6 @@ export function CreateSaleForm({
   const saleSchema = z.object({
     id: z.string().optional(),
     saleCode: z.string().optional(),
-    // saleDate: z.date().optional(),
     entryValue: z.coerce
       .number()
       .min(0, "O valor de entrada deve ser positivo"),
@@ -168,6 +167,7 @@ export function CreateSaleForm({
   const handleCreateSale: SubmitHandler<z.infer<typeof saleSchema>> = (
     sale
   ) => {
+    console.log(sale);
     newSale.mutate(sale as SaleToCreate);
   };
 
@@ -188,7 +188,6 @@ export function CreateSaleForm({
     defaultValues: {
       id: data?.id,
       saleCode: data?.saleCode,
-      // saleDate: data?.saleDate,
       entryValue: data?.entryValue,
       financedAmount: data?.financedAmount,
       totalAmount: data?.totalAmount,
@@ -217,7 +216,7 @@ export function CreateSaleForm({
   const selectedVehicle = vehiclesList.find((e) => e.vehicleId === fieldVehicle.value);
   const selectedSeller = sellersList.find((e) => e.id === fieldSeller.value);
 
-  console.log('vec: ', selectedVehicle, 'cli: ', selectedClient, 'sel: ', selectedSeller)
+  // console.log('vec: ', selectedVehicle, 'cli: ', selectedClient, 'sel: ', selectedSeller)
   return (
     <form
       className="flex flex-col gap-4"
