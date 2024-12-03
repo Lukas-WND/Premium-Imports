@@ -110,18 +110,35 @@ export function CreateSaleForm({
     }
   }, [sellersList.length, setSellersList, toast, openSellers]);
 
-  const saleSchema = z.object({
-    id: z.string().optional(),
-    saleCode: z.string().optional(),
-    entryValue: z.coerce
-      .number()
-      .min(0, "O valor de entrada deve ser positivo"),
-    financedAmount: z.coerce.number().optional(),
-    totalAmount: z.coerce.number().min(1, "O valor total é obrigatório"),
-    client: z.string().min(1, "O cliente é obrigatório"),
-    seller: z.string().min(1, "O vendedor é obrigatório"),
-    vehicle: z.string().min(1, "O veículo é obrigatório"),
-  });
+  const saleSchema = z
+    .object({
+      id: z.string().optional(),
+      saleCode: z.string().optional(),
+      entryValue: z.coerce
+        .number()
+        .min(0, "O valor de entrada deve ser positivo"),
+      financedAmount: z.coerce.number().optional(),
+      totalAmount: z.coerce.number().min(1, "O valor total é obrigatório"),
+      client: z.string().min(1, "O cliente é obrigatório"),
+      seller: z.string().min(1, "O vendedor é obrigatório"),
+      vehicle: z.string().min(1, "O veículo é obrigatório"),
+    })
+    .refine(
+      (schemaData) => {
+        const calculatedTotal =
+          (schemaData.entryValue || 0) + (schemaData.financedAmount || 0);
+
+        if (selectedVehicle && calculatedTotal < selectedVehicle.price) {
+          return false;
+        }
+
+        return true;
+      },
+      {
+        message: "O valor total não pode ser menor que o preço do veículo",
+        path: ["totalAmount"],
+      }
+    );
 
   const newSale = useMutation({
     mutationFn: createSale,
@@ -181,6 +198,7 @@ export function CreateSaleForm({
     register,
     handleSubmit,
     control,
+    watch,
     setValue,
     formState: { errors, isSubmitting },
   } = useForm<z.infer<typeof saleSchema>>({
@@ -213,10 +231,20 @@ export function CreateSaleForm({
   });
 
   const selectedClient = clientsList.find((e) => e.id === fieldClient.value);
-  const selectedVehicle = vehiclesList.find((e) => e.vehicleId === fieldVehicle.value);
+  const selectedVehicle = vehiclesList.find(
+    (e) => e.vehicleId === fieldVehicle.value
+  );
   const selectedSeller = sellersList.find((e) => e.id === fieldSeller.value);
 
-  // console.log('vec: ', selectedVehicle, 'cli: ', selectedClient, 'sel: ', selectedSeller)
+  const entryValue = watch("entryValue");
+  const financedAmount = watch("financedAmount");
+
+  useEffect(() => {
+    const calculatedTotal: number =
+      Number(entryValue || 0) + Number(financedAmount || 0);
+    setValue("totalAmount", calculatedTotal, { shouldTouch: true, });
+  }, [entryValue, financedAmount, setValue]);
+
   return (
     <form
       className="flex flex-col gap-4"
@@ -268,6 +296,8 @@ export function CreateSaleForm({
           className="mt-2"
           type="text"
           placeholder="Valor total"
+          disabled
+          value={watch("totalAmount")}
           {...register("totalAmount")}
         />
         {errors.totalAmount && (
@@ -277,17 +307,15 @@ export function CreateSaleForm({
         )}
       </Label>
 
-      {selectedVehicle && (
-        <Label>
-          <p>Valor Veículo</p>
-          <Input
-            className="mt-2 w-full"
-            placeholder="Valor total"
-            disabled
-            value={`R$ ${selectedVehicle?.price}`}
-          />
-        </Label>
-      )}
+      <Label>
+        <p>Valor Veículo</p>
+        <Input
+          className="mt-2 w-full"
+          placeholder="Valor total"
+          disabled
+          value={selectedVehicle?.price || 0}
+        />
+      </Label>
 
       <Label>
         <p>Cliente</p>
