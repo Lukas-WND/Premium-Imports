@@ -23,44 +23,21 @@ export class OrderService {
 
   // Método para criar um novo pedido
   async create(createOrderDto: CreateOrderDto) {
-    const { clientId, sellerId, automakerId, ...orderData } = createOrderDto;
+    const { client, seller, automaker, ...orderData } = createOrderDto;
 
-    // Obtém o cliente pelo serviço
-    const client = await this.clientService.findOne(clientId);
-    if (!client) {
-      throw new NotFoundException(`Cliente com ID ${clientId} não encontrado.`);
-    }
+    const clientFound = await this.getClient(client);
+    const sellerFound = await this.getSeller(seller);
+    const automakerFound = await this.getAutomaker(automaker);
 
-    // Obtém o vendedor pelo serviço
-    const seller = await this.sellerService.findOne(sellerId);
-    if (!seller) {
-      throw new NotFoundException(
-        `Vendedor com ID ${sellerId} não encontrado.`,
-      );
-    }
-
-    // Obtém a montadora pelo serviço
-    const automaker = await this.automakerService.findOne(automakerId);
-    if (!automaker) {
-      throw new NotFoundException(
-        `Montadora com ID ${automakerId} não encontrada.`,
-      );
-    }
-
-    const orderCode: string = `ORD-${Date.now()}`;
-    const orderDate: Date = new Date();
-
-    // Cria a entidade Order
     const order = this.orderRepository.create({
       ...orderData,
-      orderCode,
-      orderDate,
-      client,
-      seller,
-      automaker,
+      orderCode: `ORD-${Date.now()}`,
+      orderDate: new Date(),
+      client: clientFound,
+      seller: sellerFound,
+      automaker: automakerFound,
     });
 
-    // Salva o pedido no banco de dados
     return this.orderRepository.save(order);
   }
 
@@ -69,10 +46,6 @@ export class OrderService {
     const orders = await this.orderRepository.find({
       relations: ['client', 'seller', 'automaker'],
     });
-
-    if (!orders.length) {
-      throw new NotFoundException('Nenhum pedido encontrado.');
-    }
 
     return orders;
   }
@@ -97,31 +70,16 @@ export class OrderService {
 
     const order = await this.findOne(id);
 
-    // Atualiza os dados do pedido
-    if (status) {
-      if (
-        status === OrderStatus.COMPLETED &&
-        order.status !== OrderStatus.COMPLETED
-      ) {
-        // Regras ao mudar o status para COMPLETED
-        const vehicleData: CreateVehicleDto = {
-          chassisNumber: `CHASSIS-${order.id}`, // Gera um número fictício para o chassi
-          fabricatingYear: order.modelYear,
-          color: order.color,
-          price: order.orderValue,
-          modelName: order.modelName,
-          modelYear: order.modelYear,
-        };
-
-        // Chama o VehicleService para criar o veículo
-        await this.vehicleService.create(vehicleData);
-      }
-
-      order.status = status;
+    // Atualiza o status e cria veículo, se necessário
+    if (
+      status &&
+      status === OrderStatus.COMPLETED &&
+      order.status !== OrderStatus.COMPLETED
+    ) {
+      await this.handleOrderCompletion(order);
     }
 
-    Object.assign(order, updateData);
-
+    Object.assign(order, { ...updateData, status });
     return this.orderRepository.save(order);
   }
 
@@ -130,5 +88,45 @@ export class OrderService {
     const order = await this.findOne(id);
     await this.orderRepository.softDelete(order.id);
     return { message: `Pedido com ID ${id} removido com sucesso.` };
+  }
+
+  // Método auxiliar para lidar com conclusão de pedido
+  private async handleOrderCompletion(order: Order) {
+    const vehicleData: CreateVehicleDto = {
+      chassisNumber: `CHASSIS-${order.id}`,
+      fabricatingYear: order.modelYear,
+      color: order.color,
+      price: order.orderValue,
+      modelName: order.modelName,
+      modelYear: order.modelYear,
+    };
+
+    await this.vehicleService.create(vehicleData);
+  }
+
+  // Métodos auxiliares para validação de entidades relacionadas
+  private async getClient(clientId: string) {
+    const client = await this.clientService.findOne(clientId);
+    if (!client)
+      throw new NotFoundException(`Cliente com ID ${clientId} não encontrado.`);
+    return client;
+  }
+
+  private async getSeller(sellerId: string) {
+    const seller = await this.sellerService.findOne(sellerId);
+    if (!seller)
+      throw new NotFoundException(
+        `Vendedor com ID ${sellerId} não encontrado.`,
+      );
+    return seller;
+  }
+
+  private async getAutomaker(automakerId: string) {
+    const automaker = await this.automakerService.findOne(automakerId);
+    if (!automaker)
+      throw new NotFoundException(
+        `Montadora com ID ${automakerId} não encontrada.`,
+      );
+    return automaker;
   }
 }

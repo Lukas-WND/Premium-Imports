@@ -1,8 +1,8 @@
 export class CreateOrderDto {
   orderValue: number;
-  clientId: string;
-  sellerId: string;
-  automakerId: string;
+  client: string;
+  seller: string;
+  automaker: string;
   color: string;
   modelId?: string;
   modelName?: string;
