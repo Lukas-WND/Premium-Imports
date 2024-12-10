@@ -33,6 +33,8 @@ import { cn } from "@/lib/utils";
 import { CreateOrderDto, Order, UpdateOrderDto } from "@/app/stores/orderStore";
 import { useAutomakerStore } from "@/app/stores/automakerStore";
 import { getAutomakers } from "@/app/montadoras/data/queries";
+import { useModelStore } from "@/app/stores/modelStore";
+import { getModels } from "@/app/modelos/data/queries";
 
 export function CreateSaleForm({
   data,
@@ -43,6 +45,9 @@ export function CreateSaleForm({
 }) {
   const { toast } = useToast();
   const addOrder = useOrderStore((state) => state.addOrderInList);
+
+  const modelList = useModelStore((state) => state.modelList);
+  const setModelList = useModelStore((state) => state.setModelList);
 
   const automakerList = useAutomakerStore((state) => state.automakerList);
   const setAutomakerList = useAutomakerStore((state) => state.setAutomakerList);
@@ -56,6 +61,25 @@ export function CreateSaleForm({
   const [openAutomaker, setOpenAutomaker] = useState(false);
   const [openClients, setOpenClients] = useState(false);
   const [openSellers, setOpenSellers] = useState(false);
+  const [openModel, setOpenModel] = useState(false);
+
+  useEffect(() => {
+    if (modelList.length === 0) {
+      queryClient
+        .fetchQuery({
+          queryKey: ["models"],
+          queryFn: getModels,
+        })
+        .then((res) => setModelList(res || []))
+        .catch((err) => {
+          toast({
+            title: "Erro ao carregar modelos",
+            description: err.message,
+            variant: "destructive",
+          });
+        });
+    }
+  }, [modelList.length, setModelList, toast, openModel]);
 
   useEffect(() => {
     if (automakerList.length === 0) {
@@ -212,11 +236,17 @@ export function CreateSaleForm({
     control: control,
   });
 
+  const { field: fieldModel } = useController({
+    name: "modelId",
+    control: control,
+  });
+
   const selectedClient = clientsList.find((e) => e.id === fieldClient.value);
   const selectedAutomaker = automakerList.find(
     (e) => e.id === fieldAutomaker.value
   );
   const selectedSeller = sellersList.find((e) => e.id === fieldSeller.value);
+  const selectedModel = modelList.find((e) => e.modelId === fieldModel.value);
 
   return (
     <form
@@ -234,29 +264,6 @@ export function CreateSaleForm({
           />
         </Label>
       )}
-
-      <Label>
-        <p>Valor do pedido</p>
-        <Input
-          className="mt-2"
-          placeholder="Valor de entrada"
-          {...register("orderValue")}
-        />
-        {errors.orderValue && (
-          <p className="mt-1 text-red-500 text-end">
-            {errors.orderValue.message}
-          </p>
-        )}
-      </Label>
-
-      <Label>
-        <p>Valor Financiado (opcional)</p>
-        <Input
-          className="mt-2"
-          placeholder="Valor financiado"
-          {...register("color")}
-        />
-      </Label>
 
       <Label>
         <p>Cliente</p>
@@ -393,7 +400,7 @@ export function CreateSaleForm({
                 className="w-full"
               />
               <CommandList className="w-full">
-                <CommandEmpty>Veículo não encontrado.</CommandEmpty>
+                <CommandEmpty>Montadora não encontrada.</CommandEmpty>
                 <CommandGroup>
                   {automakerList.map((automaker, idx) => (
                     <CommandItem
@@ -421,8 +428,89 @@ export function CreateSaleForm({
           </PopoverContent>
         </Popover>
         {errors.automaker && (
-          <p className="mt-1 text-red-500 text-end">{errors.automaker.message}</p>
+          <p className="mt-1 text-red-500 text-end">
+            {errors.automaker.message}
+          </p>
         )}
+      </Label>
+
+      <Label>
+        <p>Modelo</p>
+        <Popover open={openModel} onOpenChange={(open) => setOpenModel(open)}>
+          <PopoverTrigger asChild>
+            <Button
+              className="w-full mt-2"
+              variant="outline"
+              role="combobox"
+              onClick={() => setOpenModel(true)}
+            >
+              {selectedModel
+                ? `${selectedModel.modelName}`
+                : "Selecione o Modelo"}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-full">
+            <Command className="w-full">
+              <CommandInput
+                placeholder="Pesquise o modelo..."
+                className="w-full"
+              />
+              <CommandList className="w-full">
+                <CommandEmpty>Modelo não encontrado.</CommandEmpty>
+                <CommandGroup>
+                  {modelList.map((model, idx) => (
+                    <CommandItem
+                      key={idx}
+                      value={model.modelName}
+                      onSelect={() => {
+                        setOpenModel(false);
+                        setValue("modelId", model.modelId);
+                      }}
+                    >
+                      {`${model.modelName} ${model.modelYear}`}
+                      <Check
+                        className={cn(
+                          "ml-auto",
+                          model.modelId === fieldModel.value
+                            ? "opacity-100"
+                            : "opacity-0"
+                        )}
+                      />
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
+        {errors.automaker && (
+          <p className="mt-1 text-red-500 text-end">
+            {errors.automaker.message}
+          </p>
+        )}
+      </Label>
+
+      <Label>
+        <p>Valor do pedido</p>
+        <Input
+          className="mt-2"
+          placeholder="Valor de entrada"
+          {...register("orderValue")}
+        />
+        {errors.orderValue && (
+          <p className="mt-1 text-red-500 text-end">
+            {errors.orderValue.message}
+          </p>
+        )}
+      </Label>
+
+      <Label>
+        <p>Cor</p>
+        <Input
+          className="mt-2"
+          placeholder="Valor financiado"
+          {...register("color")}
+        />
       </Label>
 
       <div className="flex items-center justify-end gap-2 mt-4">
