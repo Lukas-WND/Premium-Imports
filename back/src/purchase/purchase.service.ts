@@ -56,14 +56,8 @@ export class PurchaseService {
    */
   async findAll() {
     const purchases = await this.purchaseRepository.find({
-      relations: ['vehicle', 'vehicle.model', 'seller'],
+      relations: ['vehicle', 'vehicle.modelId', 'seller'],
     });
-
-    if (!purchases.length) {
-      throw new NotFoundException(
-        'Não foram encontrados registros de compras.',
-      );
-    }
 
     return purchases;
   }

@@ -8,35 +8,37 @@ import {
 } from "@/components/ui/dialog";
 
 import { useToast } from "@/hooks/use-toast";
-import { deleteSale } from "../../data/queries";
+import { deletePurchase } from "../../data/queries";
 import { useMutation } from "@tanstack/react-query";
-import { Sale, useSaleStore } from "@/app/stores/saleStore";
+import { Purchase, usePurchaseStore } from "@/app/stores/purchaseStore";
 
 export function DialogDelete({
-  sale,
+  purchase,
   hideDialog,
 }: {
-  sale: Sale;
+  purchase: Purchase;
   hideDialog: () => void;
 }) {
   const { toast } = useToast();
-  const removeSale = useSaleStore((state) => state.removeSaleInList);
+  const removePurchase = usePurchaseStore(
+    (state) => state.removePurchaseInList
+  );
 
-  const { mutate: deleteSaleFn } = useMutation({
-    mutationFn: (id: string) => deleteSale(id),
+  const { mutate: deletePurchaseFn } = useMutation({
+    mutationFn: (id: string) => deletePurchase(id),
     onSuccess() {
       hideDialog();
-      removeSale(sale.id);
+      removePurchase(purchase.id);
       toast({
-        title: "Cliente deletado com sucesso",
+        title: "Compra deletada com sucesso",
         description:
-          "Cliente foi deletado com sucesso na base de dados do sistema!",
+          "Compra foi deletada com sucesso na base de dados do sistema!",
         style: { backgroundColor: "green", color: "white" },
       });
     },
     onError(err: any) {
       toast({
-        title: "Erro ao deletar cliente!",
+        title: "Erro ao deletar compra!",
         description: `${err.message}`,
         variant: "destructive",
       });
@@ -46,7 +48,7 @@ export function DialogDelete({
   return (
     <>
       <DialogHeader>
-        <DialogTitle>Deletar Registro de Venda</DialogTitle>
+        <DialogTitle>Deletar Registro de Compra</DialogTitle>
         <DialogDescription>
           Tem certeza que deseja deletar esse registro do sistema? Essa ação não
           pode ser desfeita!
@@ -59,7 +61,7 @@ export function DialogDelete({
         <Button
           variant="destructive"
           onClick={() => {
-            deleteSaleFn(sale.id);
+            deletePurchaseFn(purchase.id);
           }}
         >
           Deletar
