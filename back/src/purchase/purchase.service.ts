@@ -76,7 +76,7 @@ export class PurchaseService {
   async findOne(id: string) {
     const purchase = await this.purchaseRepository.findOne({
       where: { id },
-      relations: ['vehicle', 'vehicle.model', 'seller', 'client'],
+      relations: ['vehicle', 'vehicle.modelId', 'seller', 'client'],
     });
 
     if (!purchase) {

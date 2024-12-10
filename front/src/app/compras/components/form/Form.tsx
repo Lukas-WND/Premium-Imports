@@ -131,7 +131,7 @@ export function CreatePurchaseForm({
   const newPurchase = useMutation({
     mutationFn: createPurchase,
     onSuccess: (createdPurchase: Purchase) => {
-      queryClient.invalidateQueries({ queryKey: ["purchases", "vehicles"] });
+      queryClient.invalidateQueries({ queryKey: ["purchases"] });
       addPurchase(createdPurchase);
       toast({
         title: "Compra registrada com sucesso!",
@@ -153,7 +153,7 @@ export function CreatePurchaseForm({
     mutationFn: (purchase: PurchaseToUpdate) =>
       updatePurchase(purchase.id, purchase),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["purchases", "vehicles"] });
+      queryClient.invalidateQueries({ queryKey: ["purchases"] });
       toast({
         title: "Compra atualizada com sucesso!",
         description: `A compra foi atualizada na base de dados.`,
@@ -197,10 +197,15 @@ export function CreatePurchaseForm({
     defaultValues: {
       id: data?.id,
       purchaseValue: data?.purchaseValue,
-      vehicle: data?.vehicle.vehicleId,
+      vehicle: `${data?.vehicle.modelId.modelName} ${data?.vehicle.modelId.modelYear} - ${data?.vehicle.chassisNumber}`,
       client: data?.client.id,
       seller: data?.seller.id,
       modelId: data?.vehicle?.modelId.modelId,
+      modelName: data?.vehicle.modelId.modelName,
+      modelYear: data?.vehicle.modelId.modelYear,
+      chassisNumber: data?.vehicle.chassisNumber,
+      color: data?.vehicle.color,
+      plate: data?.vehicle.plate,
     },
   });
 
@@ -360,7 +365,7 @@ export function CreatePurchaseForm({
           open={openVehicles}
           onOpenChange={(open) => setOpenVehicles(open)}
         >
-          <PopoverTrigger asChild>
+          <PopoverTrigger asChild disabled={!!data}>
             <Button
               className="w-full mt-2"
               variant="outline"
