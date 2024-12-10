@@ -9,6 +9,7 @@ import { SellerService } from 'src/seller/seller.service';
 import { AutomakerService } from 'src/automaker/automaker.service';
 import { VehicleService } from 'src/vehicle/vehicle.service';
 import { CreateVehicleDto } from 'src/vehicle/dto/create-vehicle.dto';
+import { ModelService } from 'src/model/model.service';
 
 @Injectable()
 export class OrderService {
@@ -19,15 +20,19 @@ export class OrderService {
     private readonly sellerService: SellerService,
     private readonly automakerService: AutomakerService,
     private readonly vehicleService: VehicleService,
+    private readonly modelService: ModelService,
   ) {}
 
   // Método para criar um novo pedido
   async create(createOrderDto: CreateOrderDto) {
-    const { client, seller, automaker, ...orderData } = createOrderDto;
+    const { client, seller, automaker, modelId, ...orderData } = createOrderDto;
 
     const clientFound = await this.getClient(client);
     const sellerFound = await this.getSeller(seller);
     const automakerFound = await this.getAutomaker(automaker);
+    const model = modelId
+      ? await this.modelService.findOne(modelId)
+      : undefined;
 
     const order = this.orderRepository.create({
       ...orderData,
@@ -36,6 +41,8 @@ export class OrderService {
       client: clientFound,
       seller: sellerFound,
       automaker: automakerFound,
+      modelName: model?.modelName || createOrderDto.modelName,
+      modelYear: model?.modelYear || createOrderDto.modelYear,
     });
 
     return this.orderRepository.save(order);
