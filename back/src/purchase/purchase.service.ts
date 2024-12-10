@@ -7,6 +7,7 @@ import { Purchase } from './entities/purchase.entity';
 import { VehicleService } from '../vehicle/vehicle.service';
 import { SellerService } from '../seller/seller.service';
 import { ModelService } from '../model/model.service';
+import { ClientService } from 'src/client/client.service';
 
 @Injectable()
 export class PurchaseService {
@@ -15,6 +16,7 @@ export class PurchaseService {
     private readonly purchaseRepository: Repository<Purchase>,
     private readonly vehicleService: VehicleService,
     private readonly sellerService: SellerService,
+    private readonly clientService: ClientService,
     private readonly modelService: ModelService,
   ) {}
 
@@ -24,20 +26,21 @@ export class PurchaseService {
    * @returns A compra criada com sucesso.
    */
   async create(createPurchaseDto: CreatePurchaseDto) {
-    const seller = await this.sellerService.findOne(createPurchaseDto.sellerId);
-
-    // Criando ou encontrando o modelo do veículo
-    const model = createPurchaseDto.vehicle.modelId
-      ? await this.modelService.findOne(createPurchaseDto.vehicle.modelId)
-      : await this.modelService.create({
-          modelName: createPurchaseDto.vehicle.modelName,
-          modelYear: createPurchaseDto.vehicle.modelYear,
-        });
+    const seller = await this.sellerService.findOne(createPurchaseDto.seller);
+    const client = await this.clientService.findOne(createPurchaseDto.client);
+    const code = `PRC-${Date.now()}`
+    const model = createPurchaseDto.modelId ? await this.modelService.findOne(createPurchaseDto.modelId) : undefined;
 
     // Criando o veículo
     const vehicle = await this.vehicleService.create({
-      ...createPurchaseDto.vehicle,
-      modelId: model.modelId,
+      modelId: createPurchaseDto.modelId,
+      modelName: createPurchaseDto.modelName || model.modelName,
+      modelYear: createPurchaseDto.modelYear || model.modelYear,
+      price: createPurchaseDto.purchaseValue,
+      chassisNumber: createPurchaseDto.chassisNumber,
+      color: createPurchaseDto.color,
+      plate: createPurchaseDto.plate,
+      fabricatingYear: createPurchaseDto.modelYear || model.modelYear,
     });
 
     // Criando a compra
@@ -45,6 +48,9 @@ export class PurchaseService {
       ...createPurchaseDto,
       vehicle,
       seller,
+      client,
+      purchaseCode: code,
+      purchaseDate: new Date()
     });
 
     return this.purchaseRepository.save(newPurchase);
@@ -56,7 +62,7 @@ export class PurchaseService {
    */
   async findAll() {
     const purchases = await this.purchaseRepository.find({
-      relations: ['vehicle', 'vehicle.modelId', 'seller'],
+      relations: ['vehicle', 'vehicle.modelId', 'seller', 'client'],
     });
 
     return purchases;
@@ -70,7 +76,7 @@ export class PurchaseService {
   async findOne(id: string) {
     const purchase = await this.purchaseRepository.findOne({
       where: { id },
-      relations: ['vehicle', 'vehicle.model', 'seller'],
+      relations: ['vehicle', 'vehicle.model', 'seller', 'client'],
     });
 
     if (!purchase) {
@@ -89,18 +95,10 @@ export class PurchaseService {
   async update(id: string, updatePurchaseDto: UpdatePurchaseDto) {
     const purchase = await this.findOne(id);
 
-    if (updatePurchaseDto.sellerId) {
+    if (updatePurchaseDto.seller) {
       purchase.seller = await this.sellerService.findOne(
-        updatePurchaseDto.sellerId,
+        updatePurchaseDto.seller,
       );
-    }
-
-    if (updatePurchaseDto.vehicle) {
-      const updatedVehicle = await this.vehicleService.update(
-        purchase.vehicle.vehicleId,
-        updatePurchaseDto.vehicle,
-      );
-      purchase.vehicle = updatedVehicle;
     }
 
     Object.assign(purchase, updatePurchaseDto);

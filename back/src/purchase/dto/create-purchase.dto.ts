@@ -1,8 +1,11 @@
-import { CreateVehicleDto } from "src/vehicle/dto/create-vehicle.dto";
-
 export class CreatePurchaseDto {
   purchaseValue: number;
-  clientId: string;
-  sellerId: string;
-  vehicle: CreateVehicleDto;
+  client: string;
+  seller: string;
+  modelId?: string;
+  modelName?: string;
+  modelYear?: number;
+  plate: string;
+  color: string;
+  chassisNumber: string;
 }

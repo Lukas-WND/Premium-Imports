@@ -15,22 +15,19 @@ export type Purchase = {
 };
 
 export type PurchaseToCreate = {
-  purchaseCode: string;
-  purchaseDate: Date;
   purchaseValue: number;
   client: string; 
   seller: string;
   modelId?: string;
   modelName?: string;
   modelYear?: number;
+  plate: string;
   chassisNumber: string;
   color: string;
 };
 
 export type PurchaseToUpdate = {
   id: string;
-  purchaseCode?: string;
-  purchaseDate?: Date;
   purchaseValue?: number;
   client?: string;
   seller?: string;

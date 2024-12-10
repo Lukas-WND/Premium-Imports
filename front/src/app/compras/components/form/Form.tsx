@@ -125,12 +125,13 @@ export function CreatePurchaseForm({
     modelYear: z.coerce.number().optional(),
     color: z.string().min(1, "A cor do veículo é obrigatória"),
     chassisNumber: z.string().min(1, "O número do chassi é obrigatório"),
+    plate: z.string().min(1, "A placa é obrigatória"),
   });
 
   const newPurchase = useMutation({
     mutationFn: createPurchase,
     onSuccess: (createdPurchase: Purchase) => {
-      queryClient.invalidateQueries({ queryKey: ["purchases", "vehicle"] });
+      queryClient.invalidateQueries({ queryKey: ["purchases", "vehicles"] });
       addPurchase(createdPurchase);
       toast({
         title: "Compra registrada com sucesso!",
@@ -152,7 +153,7 @@ export function CreatePurchaseForm({
     mutationFn: (purchase: PurchaseToUpdate) =>
       updatePurchase(purchase.id, purchase),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["purchases", "vehicle"] });
+      queryClient.invalidateQueries({ queryKey: ["purchases", "vehicles"] });
       toast({
         title: "Compra atualizada com sucesso!",
         description: `A compra foi atualizada na base de dados.`,
@@ -172,7 +173,9 @@ export function CreatePurchaseForm({
   const handleCreatePurchase: SubmitHandler<z.infer<typeof purchaseSchema>> = (
     purchase
   ) => {
-    console.log(purchase);
+    if (purchase.modelId == "no_model") {
+      delete purchase.modelId;
+    }
     newPurchase.mutate(purchase as PurchaseToCreate);
   };
 
@@ -447,16 +450,27 @@ export function CreatePurchaseForm({
         </div>
       )}
 
+      <Label>
+        <p>Número do Chassi</p>
+        <Input
+          className="mt-2"
+          placeholder="Num. do Chassi..."
+          {...register("chassisNumber")}
+        />
+        {errors.chassisNumber && (
+          <p className="text-red-500">{errors.chassisNumber.message}</p>
+        )}
+      </Label>
       <div className="flex gap-4 w-full">
         <Label className="w-1/2">
-          <p>Número do Chassi</p>
+          <p>Placa</p>
           <Input
             className="mt-2"
-            placeholder="Num. do Chassi..."
-            {...register("chassisNumber")}
+            placeholder="Placa..."
+            {...register("plate")}
           />
-          {errors.chassisNumber && (
-            <p className="text-red-500">{errors.chassisNumber.message}</p>
+          {errors.plate && (
+            <p className="text-red-500">{errors.plate.message}</p>
           )}
         </Label>
 

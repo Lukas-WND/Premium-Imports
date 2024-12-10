@@ -43,7 +43,9 @@ export class ModelService {
    * @returns O modelo encontrado ou uma exceção.
    */
   async findOne(id: string) {
-    const model = await this.findModelByIdOrFail(id);
+    const model = await this.modelRepository.findOne({
+      where: { modelId: id },
+    });
     return model;
   }
 
