@@ -3,6 +3,13 @@ import { Client } from "./clientStore";
 import { Seller } from "./sellerStore";
 import { Automaker } from "./automakerStore";
 
+export enum Status {
+  "IN_PROCESSING",
+  "CONFIRMED",
+  "SENT",
+  "COMPLETED",
+}
+
 export type Order = {
   id: string;
   orderCode: string;
@@ -15,7 +22,7 @@ export type Order = {
   modelId?: string;
   modelName?: string;
   modelYear?: number;
-  status: number;
+  status: Status;
   createdAt: Date;
 };
 

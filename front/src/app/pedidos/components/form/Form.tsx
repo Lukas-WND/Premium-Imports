@@ -12,7 +12,6 @@ import { createOrder, updateOrder } from "../../data/queries";
 import { useClientStore } from "@/app/stores/clientStore";
 import { useSellerStore } from "@/app/stores/sellerStore";
 import { useEffect, useState } from "react";
-import { getVehicles } from "@/app/veiculos/data/queries";
 import { getClients } from "@/app/clientes/data/queries";
 import { getSellers } from "@/app/vendedores/data/queries";
 import {
@@ -35,6 +34,13 @@ import { useAutomakerStore } from "@/app/stores/automakerStore";
 import { getAutomakers } from "@/app/montadoras/data/queries";
 import { useModelStore } from "@/app/stores/modelStore";
 import { getModels } from "@/app/modelos/data/queries";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export function CreateSaleForm({
   data,
@@ -145,6 +151,7 @@ export function CreateSaleForm({
     modelId: z.string().optional(),
     modelName: z.string().optional(),
     modelYear: z.number().optional(),
+    status: z.coerce.number().optional(),
   });
 
   const newOrder = useMutation({
@@ -218,6 +225,7 @@ export function CreateSaleForm({
       modelId: data?.modelId,
       modelName: data?.modelName,
       modelYear: data?.modelYear,
+      status: data?.status,
     },
   });
 
@@ -238,6 +246,11 @@ export function CreateSaleForm({
 
   const { field: fieldModel } = useController({
     name: "modelId",
+    control: control,
+  });
+
+  const { field: fieldStatus } = useController({
+    name: "status",
     control: control,
   });
 
@@ -508,10 +521,35 @@ export function CreateSaleForm({
         <p>Cor</p>
         <Input
           className="mt-2"
-          placeholder="Valor financiado"
+          placeholder="Vermelho..."
           {...register("color")}
         />
       </Label>
+
+      {data && (
+        <Label>
+          Status
+          <Select
+            defaultValue={data ? (fieldStatus.value || 0).toString() : ""}
+            onValueChange={fieldStatus.onChange}
+          >
+            <SelectTrigger className="mt-2">
+              <SelectValue placeholder="Informe o status..." />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="0">PROCESSANDO</SelectItem>
+              <SelectItem value="1">CONFIRMADO</SelectItem>
+              <SelectItem value="2">ENVIADO</SelectItem>
+              <SelectItem value="3">CONCLUÍDO</SelectItem>
+            </SelectContent>
+          </Select>
+          {errors.status && (
+            <p className="mt-1 text-red-500 text-end">
+              {errors.status.message}
+            </p>
+          )}
+        </Label>
+      )}
 
       <div className="flex items-center justify-end gap-2 mt-4">
         <Button type="submit" disabled={isSubmitting}>

@@ -21,47 +21,26 @@ export class VehicleService {
    * @returns O veículo criado.
    */
   async create(createVehicleDto: CreateVehicleDto) {
-    let model: Model;
+    console.log('Dados recebidos para criação do veículo:', createVehicleDto);
 
-    console.log(createVehicleDto);
+    let model = await this.findOrCreateModel(createVehicleDto.modelId, createVehicleDto.modelName, createVehicleDto.modelYear);
 
-    // Verifica se um `modelId` foi fornecido e tenta buscar o modelo.
-    if (createVehicleDto.modelId) {
-      model = await this.modelService.findOne(createVehicleDto.modelId);
-
-      if (!model) {
-        throw new NotFoundException(
-          `Modelo com o ID ${createVehicleDto.modelId} não encontrado.`,
-        );
-      }
-    } else {
-      // Se o `modelId` não foi fornecido, cria um novo modelo.
-      model = await this.modelService.create({
-        modelName: createVehicleDto.modelName,
-        modelYear: createVehicleDto.modelYear,
-      });
-    }
-
-    // Cria o veículo associado ao modelo.
     const newVehicle = this.vehicleRepository.create({
       ...createVehicleDto,
       modelId: model,
     });
 
-    // Salva o novo veículo no banco de dados.
     return this.vehicleRepository.save(newVehicle);
   }
 
   /**
    * Retorna todos os veículos cadastrados.
-   * @returns Lista de veículos ou uma exceção caso não existam registros.
+   * @returns Lista de veículos.
    */
   async findAll() {
-    const vehicles = await this.vehicleRepository.find({
+    return this.vehicleRepository.find({
       relations: ['modelId'],
     });
-
-    return vehicles;
   }
 
   /**
@@ -84,31 +63,15 @@ export class VehicleService {
 
     let model: Model | undefined;
 
-    // Se um novo `modelId` for fornecido, busca o modelo correspondente.
-    if (updateVehicleDto.modelId) {
-      model = await this.modelService.findOne(updateVehicleDto.modelId);
-
-      if (!model) {
-        throw new NotFoundException(
-          `Modelo com o ID ${updateVehicleDto.modelId} não encontrado.`,
-        );
-      }
-    }
-    // Se o `modelId` não foi fornecido, mas o nome e o ano do modelo foram fornecidos, cria um novo modelo.
-    else if (updateVehicleDto.modelName && updateVehicleDto.modelYear) {
-      model = await this.modelService.create({
-        modelName: updateVehicleDto.modelName,
-        modelYear: updateVehicleDto.modelYear,
-      });
+    if (updateVehicleDto.modelId || (updateVehicleDto.modelName && updateVehicleDto.modelYear)) {
+      model = await this.findOrCreateModel(updateVehicleDto.modelId, updateVehicleDto.modelName, updateVehicleDto.modelYear);
     }
 
-    // Atualiza o veículo, substituindo o `modelId` pelo modelo encontrado ou criado, se necessário.
     this.vehicleRepository.merge(vehicle, {
       ...updateVehicleDto,
-      modelId: model ?? vehicle.modelId, // Mantém o modelo atual se nenhum novo for fornecido.
+      modelId: model ?? vehicle.modelId,
     });
 
-    // Salva as alterações no banco de dados.
     return this.vehicleRepository.save(vehicle);
   }
 
@@ -118,7 +81,7 @@ export class VehicleService {
    * @returns Resultado da operação.
    */
   async remove(id: string) {
-    await this.findVehicleByIdOrFail(id); // Garante que o veículo existe antes de tentar removê-lo.
+    await this.findVehicleByIdOrFail(id);
     return this.vehicleRepository.softDelete(id);
   }
 
@@ -129,15 +92,43 @@ export class VehicleService {
    */
   private async findVehicleByIdOrFail(id: string): Promise<Vehicle> {
     const vehicle = await this.vehicleRepository.findOne({
-      where: { vehicleId: id }, relations: ['modelId']
+      where: { vehicleId: id },
+      relations: ['modelId'],
     });
 
     if (!vehicle) {
-      throw new NotFoundException(
-        'Nenhum veículo encontrado com o ID informado.',
-      );
+      throw new NotFoundException('Nenhum veículo encontrado com o ID informado.');
     }
 
     return vehicle;
+  }
+
+  /**
+   * Helper: Busca ou cria um modelo com base no ID, nome e ano fornecidos.
+   * @param modelId ID do modelo (opcional).
+   * @param modelName Nome do modelo (opcional).
+   * @param modelYear Ano do modelo (opcional).
+   * @returns O modelo encontrado ou criado.
+   */
+  private async findOrCreateModel(modelId?: string, modelName?: string, modelYear?: number): Promise<Model> {
+    let model: Model | undefined;
+
+    if (modelId) {
+      model = await this.modelService.findOne(modelId);
+    }
+
+    if (!model && modelName && modelYear) {
+      model = await this.modelService.findByNameAndYear(modelName, modelYear);
+    }
+
+    if (!model && modelName && modelYear) {
+      model = await this.modelService.create({ modelName, modelYear });
+    }
+
+    if (!model) {
+      throw new NotFoundException('Não foi possível localizar ou criar o modelo para o veículo.');
+    }
+
+    return model;
   }
 }
